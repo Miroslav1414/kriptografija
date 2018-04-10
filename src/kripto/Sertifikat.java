@@ -158,9 +158,9 @@ public class Sertifikat {
     }
     
     //da li je privatni kljuc kljuc bas tog sertifikata
-    public boolean isMatch(){
-        privateKey.
-    }
+//    public boolean isMatch(){
+//        privateKey.
+//    }
     
     
 

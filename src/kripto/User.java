@@ -122,9 +122,28 @@ public class User {
         return false;
     }
     
-//    public boolean keyMatch(String pathToPrivateKey){
-//        Se
-//    }
+    public boolean keyMatch(String pathToPrivateKey){
+        try {
+            PublicKey publicKey = sertifikat.getPublicKey();            
+            Cipher sifrat = Cipher.getInstance("RSA");
+            sifrat.init(Cipher.ENCRYPT_MODE, publicKey);
+            
+            byte [] sifrat1 = sifrat.doFinal("miso".getBytes("utf-8"));
+            
+            PrivateKey privateKey = sertifikat.getPrivateKey(pathToPrivateKey);
+            sifrat.init(Cipher.DECRYPT_MODE, privateKey);
+            
+            byte [] sifrat2= sifrat.doFinal(sifrat1);
+            if(new String(sifrat2,"UTF-8").equals("miso"))
+                return true;
+
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+        return false;
+    }
 
 //    public static void main(String[] args) {
 //        new User().writeUsers();

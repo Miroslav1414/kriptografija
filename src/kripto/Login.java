@@ -126,8 +126,10 @@ public class Login extends javax.swing.JDialog {
             for (User u : korisnici) {
                 if (u.login(txtUsername.getText(), new String(this.txtPassword.getPassword()))) {
 
-//                Main.KORISNIK = u;
-//                u.
+                Main.KORISNIK = u;
+                if (!u.keyMatch(txtPrivateKeyPath.getText()))
+                    new Poruka("Privatni kljuc ne odgovara vasem sertifikatu!","ERROR","ERROR");
+                
                     new Poruka("Ima korisnik", "Info", "");
                 }
             }
