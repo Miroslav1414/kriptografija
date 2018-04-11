@@ -119,9 +119,10 @@ public class Login extends javax.swing.JDialog {
 
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
         User[] korisnici = new User().readUsers();
+        boolean uslov = true;
 
         if ("".equals(txtPrivateKeyPath.getText())) {
-            new Poruka("Morate ucitati privatni kljuc", "WARNING", "WARNING");
+            new Poruka("Morate ucitati privatni kljuc", "Info", "Info");
         } else {
             for (User u : korisnici) {
                 if (u.login(txtUsername.getText(), new String(this.txtPassword.getPassword()))) {
@@ -129,10 +130,21 @@ public class Login extends javax.swing.JDialog {
                 Main.KORISNIK = u;
                 if (!u.keyMatch(txtPrivateKeyPath.getText()))
                     new Poruka("Privatni kljuc ne odgovara vasem sertifikatu!","ERROR","ERROR");
-                
+                else
+                {
                     new Poruka("Ima korisnik", "Info", "");
+                    this.dispose();
+                    MainForm mainForm = new MainForm();
+                    mainForm.setLocationRelativeTo(null);
+                    mainForm.setVisible(true);
+                }
+                
+                uslov = false;
+                break;
                 }
             }
+            if(uslov)
+            new Poruka("Korisnicko ime ili pasword nisu ispravni", "Info", "Info");
         }
                 
         
