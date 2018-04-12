@@ -1,0 +1,234 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Slika
+{
+    public partial class Form1 : Form
+    {
+        public static Bitmap img;
+
+        public static byte [] duzina2byte(int duzina) {
+            byte[] niz = new byte[24];
+            int brojac = 0;
+            while (duzina > 0)
+            {
+                niz[brojac++] = (byte)(duzina % 2);
+                duzina /= 2;
+            }
+            return niz;
+        }
+
+        public static byte [] upisiTekst(Color pixel, byte r, byte g, byte b)
+        {
+            byte red = pixel.R;
+            byte green = pixel.G;
+            byte blue = pixel.B;
+
+            red = (r == 1) ? (byte)(red | 1) : (byte)(red & ~1);
+            green = (g == 1) ? (byte)(green | 1) : (byte)(green & ~1);
+            blue = (b == 1) ? (byte)(blue | 1) : (byte)(blue & ~1);
+
+            return new byte[] {red,green,blue};
+        }
+
+        public static byte[] char2byte(int duzina) {
+            byte[] niz = new byte[8];
+            int brojac = 8;
+            while (duzina > 0)
+            {
+                niz[--brojac] = (byte)(duzina % 2);
+                duzina /= 2;
+            }
+            return niz;
+        }
+
+        public static void kodovanje(Bitmap slika, String tekst,TextBox txt) {
+
+            byte[] nizBitaUlaznogTeksta = new byte[tekst.Length * 8];
+            int ii = 0;
+            foreach (char a in tekst)
+            {
+                char2byte(a).CopyTo(nizBitaUlaznogTeksta, ii);
+                ii += 8;
+            }
+
+            byte[] prefiks = duzina2byte(nizBitaUlaznogTeksta.Length);
+            Byte[] upis = new Byte[nizBitaUlaznogTeksta.Length + prefiks.Length+3];
+
+            prefiks.CopyTo(upis,0);
+            nizBitaUlaznogTeksta.CopyTo(upis,prefiks.Length);
+
+            byte[] tempBoje = new byte[3];
+            int brojac = 0;
+            bool uslov = false;
+            string provjera = "";
+            for (int i =0; i<slika.Width; i++)
+            {
+                for(int j = 0; j < slika.Height; j++)
+                {
+                    if (brojac >= upis.Length-3) uslov = true;
+                    if (uslov) break;
+                    tempBoje = upisiTekst(slika.GetPixel(i, j), upis[brojac], upis[brojac+1], upis[brojac+2]);
+                    slika.SetPixel(i, j, Color.FromArgb(255, tempBoje[0], tempBoje[1], tempBoje[2]));
+                   
+                    brojac += 3;
+                }
+                if (uslov) break;
+            }
+
+            slika.Save("C:\\Users\\Miso\\Desktop\\bit2.bmp");
+        }
+
+        public static int list2int(byte[] niz)
+        {
+            int broj = 0;
+            int inc = 1;
+            foreach (byte a in niz)
+            {
+                broj += inc * a;
+                inc *= 2;
+            }
+
+            return broj;
+        }
+
+        public static byte[] get3bitaIzPiksela(Color pixel)
+        {
+            byte[] niz = new byte[3];
+            niz[0] = ((byte)(pixel.R & 0x01));
+            niz[1] = ((byte)(pixel.G & 0x01));
+            niz[2] = ((byte)(pixel.B & 0x01));
+            return niz;
+        }
+
+        public static string byte2string(byte[] niz) {
+            string rez = "";
+            for (int i = 1; i <= (niz.Length-3); i += 8) {
+                rez += (char)(niz[i-1]*128 + niz[i]*64 + niz[i+1]*32 + 16*niz[i+2] + 8*niz[i+3] + 4*niz[i+4] + 2*niz[i+5] + niz[i+6]);
+            }
+            return rez;
+        }
+
+        public static string dekodovanje(Bitmap slika)
+        {
+            int duzina = 0;
+            byte[] prefiks = new byte[24];
+            byte[] triBitaIzPiksela = new byte[3];
+            int pokazivacNaPrefiks = 0;
+            int brojac = 0;
+            bool prekid = false;
+            
+            for (int i = 0; i < slika.Width; i++)
+            {
+                for (int j = 0; j < slika.Height; j++)
+                {
+                    triBitaIzPiksela = get3bitaIzPiksela(slika.GetPixel(i,j));
+                    prefiks[pokazivacNaPrefiks] = triBitaIzPiksela[0];
+                    prefiks[pokazivacNaPrefiks+1] = triBitaIzPiksela[1];
+                    prefiks[pokazivacNaPrefiks+2] = triBitaIzPiksela[2];
+                    pokazivacNaPrefiks += 3;
+                    brojac++;
+                    if (brojac == 8)
+                    {
+                        prekid = true;
+                        break;
+                    }
+                }
+                if (prekid) break;
+            }
+
+            duzina = list2int(prefiks);
+            brojac = 0;
+
+            byte[] nizByta = new byte[duzina+3];
+            duzina += 3;//dopuna
+            int preskoci8 = 0;
+            prekid = false;
+            
+            
+            for (int i =0 ; i < slika.Width; i++)
+            {
+                for (int j = 0; j < slika.Height; j++)
+                {
+                    preskoci8++;
+                    if (preskoci8 < 9)
+                        continue;
+
+                    triBitaIzPiksela = get3bitaIzPiksela(slika.GetPixel(i, j));
+                    nizByta[brojac] = triBitaIzPiksela[0];
+                    nizByta[brojac+1] = triBitaIzPiksela[1];
+                    nizByta[brojac+2] = triBitaIzPiksela[2];
+
+                    brojac += 3;
+
+                    if (brojac >= duzina-3)
+                    {
+                        prekid = true;
+                        break;
+                    }
+                }
+                if (prekid) break;
+            }
+
+            string izlaz = byte2string(nizByta);
+            slika.Dispose();
+
+            return "duzina= " + (duzina-3) + ". Duzina poruke: " + izlaz.Length + Environment.NewLine+  izlaz;
+            
+        }
+
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnOpen_Click(object sender, EventArgs e)
+        {
+
+            img = new Bitmap("C:\\Users\\Miso\\Desktop\\bit.bmp");
+            pic1.Image = img;
+            //using (OpenFileDialog fdialog = new OpenFileDialog())
+            //{
+            //    fdialog.Title = "Open image";
+            //    fdialog.Filter = "png files (*.png) | *.png";
+
+            //    if (fdialog.ShowDialog() == DialogResult.OK)
+            //    {
+            //        img = new Bitmap(fdialog.FileName);
+            //        pic1.Image = img;
+            //    }
+            //    fdialog.Dispose();
+            //}
+        }
+
+        private void brnKod_Click(object sender, EventArgs e)
+        {
+            kodovanje(img,txtTekst.Text,txtIspis);
+            img.Dispose();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnTest_Click(object sender, EventArgs e)
+        {
+            txtIspis.Text = dekodovanje(new Bitmap("C:\\Users\\Miso\\Desktop\\bit2.bmp"));
+
+        }
+    }
+}
+
