@@ -37,7 +37,7 @@ public class User {
 
     public void writeUsers() {
         try {
-            String korisniciText = "Admin:Admin#";
+            String korisniciText = "Admin:Admin#Miso:Miso#";
             //kriptovanje korisnika i upis u fajl
             TripleDES tdes = new TripleDES();
             String passForDes = Helper.getRandomString(20);
@@ -147,7 +147,7 @@ public class User {
 
 //    public static void main(String[] args) {
 //        new User().writeUsers();
-//        new User().readUsers();
+//        //new User().readUsers();
 //    }
 
 }

@@ -58,7 +58,7 @@ public class Sertifikat {
 
         } catch (Exception e) {
             e.printStackTrace();
-            //ispisati poruku jer certifikat ne postoji
+            new Poruka("Sertifikat "+ pathToCert +" ne postoji","ERROR","ERROR");
         }
     }
 

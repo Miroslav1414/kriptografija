@@ -6,6 +6,7 @@
 package kripto;
 
 import java.io.File;
+import java.util.ArrayList;
 
 /**
  *
@@ -15,9 +16,11 @@ public class Main {
     
     public File PRIVATE_KEY_FILE;
     public static User KORISNIK;
+    public static User [] KORISNICI;
     
     
     public static void main (String [] args){
+        KORISNICI = new User().readUsers();
         
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
