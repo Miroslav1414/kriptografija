@@ -9,10 +9,14 @@ import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.Arrays;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import kripto.ListaSlika.Renderer;
+import kripto.ListaSlika.Slika;
 
 /**
  *
@@ -20,58 +24,27 @@ import javax.swing.JPanel;
  */
 public class MainForm extends javax.swing.JFrame {
 
-    /**
-     * Creates new form MainForm
-     */
+    public void popuniKorisnike(User user){
+        ArrayList<User>  korisnici = new ArrayList<User>(Arrays.asList(Main.KORISNICI));
+        korisnici.remove(user);
+        DefaultListModel model = new DefaultListModel();
+        for (User u : korisnici)
+        model.addElement(u.getUsername());
+        listUsers.setModel(model);
+    }
+    
     public MainForm() {
         
         initComponents();
+        popuniKorisnike(Main.KORISNIK);
         DefaultListModel model = new DefaultListModel();
-        model.addElement("1");
-        model.addElement("2");
-        model.addElement("2");
-        model.addElement("13");
-        model.addElement("14");
-        model.addElement("1");
-        model.addElement("2");
-        model.addElement("2");
-        model.addElement("13");
-        model.addElement("14");
-        model.addElement("1");
-        model.addElement("2");
-        model.addElement("2");
-        model.addElement("13");
-        model.addElement("14");
-        model.addElement("1");
-        model.addElement("2");
-        model.addElement("2");
-        model.addElement("13");
-        model.addElement("14");
-        model.addElement("1");
-        model.addElement("2");
-        model.addElement("2");
-        model.addElement("13");
-        model.addElement("14");
-        model.addElement("1");
-        model.addElement("2");
-        model.addElement("2");
-        model.addElement("13");
-        model.addElement("14");
+        model.addElement(new Slika("Michael Carrick",
+                new ImageIcon(new ImageIcon("src//slike//Desert.jpg").getImage()
+                        .getScaledInstance(200, 150, java.awt.Image.SCALE_SMOOTH))));
+
+        //RENDER IMAGES N TEXT
+        listMessage.setCellRenderer(new Renderer());
         listMessage.setModel(model);
-        
-        MouseListener mouseListener = new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 1) {
-                    
-                    new Poruka(listMessage.getSelectedValue().toString(),"Info","info");
-                    model.removeElementAt(listMessage.getSelectedIndex());
-
-                    
-
-                }
-            }
-        };
-        listMessage.addMouseListener(mouseListener);
     }
 
     /**
@@ -86,15 +59,21 @@ public class MainForm extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         listMessage = new javax.swing.JList();
-        jButton1 = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        listUsers = new javax.swing.JList<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel1.setText("Poruke:");
+        jLabel1.setText("Korisnici");
 
+        listMessage.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                listMessageMouseClicked(evt);
+            }
+        });
         jScrollPane3.setViewportView(listMessage);
 
-        jButton1.setText("Procitaj poruku");
+        jScrollPane1.setViewportView(listUsers);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -104,11 +83,13 @@ public class MainForm extends javax.swing.JFrame {
                 .addGap(34, 34, 34)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton1))
-                    .addComponent(jLabel1))
-                .addContainerGap(574, Short.MAX_VALUE))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(257, 257, 257))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addContainerGap(843, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -117,13 +98,17 @@ public class MainForm extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 377, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
-                .addContainerGap(45, Short.MAX_VALUE))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 291, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(131, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void listMessageMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listMessageMouseClicked
+        Poruka poruka = new Poruka("KLIKNUO SAM", "KLIK", "INFO");
+    }//GEN-LAST:event_listMessageMouseClicked
 
     /**
      * @param args the command line arguments
@@ -164,9 +149,10 @@ public class MainForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JList listMessage;
+    private javax.swing.JList<String> listUsers;
     // End of variables declaration//GEN-END:variables
 }

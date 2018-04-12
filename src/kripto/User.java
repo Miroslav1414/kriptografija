@@ -25,6 +25,8 @@ public class User {
     private String username;
     private String password;
     private Sertifikat sertifikat;
+    
+    public String getUsername(){return username;}
 
     public User() {
     }
