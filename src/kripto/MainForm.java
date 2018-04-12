@@ -6,6 +6,9 @@
 package kripto;
 
 import java.awt.GridLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -29,7 +32,46 @@ public class MainForm extends javax.swing.JFrame {
         model.addElement("2");
         model.addElement("13");
         model.addElement("14");
+        model.addElement("1");
+        model.addElement("2");
+        model.addElement("2");
+        model.addElement("13");
+        model.addElement("14");
+        model.addElement("1");
+        model.addElement("2");
+        model.addElement("2");
+        model.addElement("13");
+        model.addElement("14");
+        model.addElement("1");
+        model.addElement("2");
+        model.addElement("2");
+        model.addElement("13");
+        model.addElement("14");
+        model.addElement("1");
+        model.addElement("2");
+        model.addElement("2");
+        model.addElement("13");
+        model.addElement("14");
+        model.addElement("1");
+        model.addElement("2");
+        model.addElement("2");
+        model.addElement("13");
+        model.addElement("14");
         listMessage.setModel(model);
+        
+        MouseListener mouseListener = new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 1) {
+                    
+                    new Poruka(listMessage.getSelectedValue().toString(),"Info","info");
+                    model.removeElementAt(listMessage.getSelectedIndex());
+
+                    
+
+                }
+            }
+        };
+        listMessage.addMouseListener(mouseListener);
     }
 
     /**
