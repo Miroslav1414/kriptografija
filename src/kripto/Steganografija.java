@@ -72,7 +72,7 @@ public class Steganografija {
             }
         }
         try {
-            ImageIO.write(image, "png", new File("C:\\Users\\miroslav.mandic\\Desktop\\45.png"));
+            ImageIO.write(image, "png", new File("C:\\Users\\miso\\Desktop\\45.png"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -101,17 +101,17 @@ public class Steganografija {
     public static void main(String [] args){
         try {
       // get the BufferedImage, using the ImageIO class
-      read(ImageIO.read(new File("C:\\Users\\miroslav.mandic\\Desktop\\456.png")));
-      Steganografija a  = new Steganografija(new File("C:\\Users\\miroslav.mandic\\Desktop\\456.png"));
+      read(ImageIO.read(new File("C:\\Users\\miso\\Desktop\\slika.png")));
+      Steganografija a  = new Steganografija(new File("C:\\Users\\miso\\Desktop\\slika.png"));
       a.upisiBiteUSliku(a.nizCharovaUnizBita("asd"));
-      read(ImageIO.read(new File("C:\\Users\\miroslav.mandic\\Desktop\\45.png")));
+      read(ImageIO.read(new File("C:\\Users\\miso\\Desktop\\45.png")));
       
       
       
       
       
     } catch (IOException e) {
-      System.err.println(e.getMessage());
+      e.printStackTrace();
     }
     }
     
