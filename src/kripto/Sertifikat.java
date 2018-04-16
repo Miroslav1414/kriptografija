@@ -32,7 +32,7 @@ public class Sertifikat {
     public static PrivateKey PRIVATE_KEY = null;
 
     private X509Certificate sertifikat = null;
-    private PrivateKey privateKey = null;
+    public static PrivateKey privateKey = null;
 
     static {
         try {
@@ -107,8 +107,14 @@ public class Sertifikat {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Sertifikat.privateKey = privateKey;
         return privateKey;
     }
+        
+    public PrivateKey getPrivateKey(){
+        return Sertifikat.privateKey;
+    }
+           
 
     //ucitava crl sa zadate putanje ako je putanja validna
     private static X509CRL getCRL(String crlPath) {

@@ -36,6 +36,10 @@ public class User {
         this.password = password;
         this.sertifikat = new Sertifikat(cert_path + name + ".der");
     }
+    
+    public PrivateKey getPrivateKey(){
+        return sertifikat.getPrivateKey();
+    }
 
     public void writeUsers() {
         try {

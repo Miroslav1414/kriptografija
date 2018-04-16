@@ -15,6 +15,7 @@ public class Helper {
     
     public static final String USER_PATH = "src//root//user.usx";
     public static final String HASH_PASS_PATH = "src//root//hp.hp";
+    public static final String SERTIFIKATI = "src//sertifikati//";
     
     public Helper(){}
     

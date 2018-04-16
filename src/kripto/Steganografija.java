@@ -4,7 +4,12 @@ package kripto;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.Arrays;
+import javax.crypto.Cipher;
 import javax.imageio.ImageIO;
+import kripto.ListaSlika.Slika;
 
 /**
  *
@@ -47,8 +52,8 @@ public class Steganografija {
         return tekstUBajtovima;
     }
     
-   
-    public void upisiBiteUSliku(byte [] tekst){
+   //tekst predstavlja niz bajtova gdje svaki bajt sardzi samo jedan bit teksta koji treba da se upise
+    public void upisiBiteUSliku(byte [] tekst,String putanja){
         //duzina teksta koji se upisuje, odnosno niza  mora biti djeljiva sa 3
         int brojac = 0;
         for(int i=0;i<image.getWidth() ;i++){
@@ -61,17 +66,17 @@ public class Steganografija {
                 int green = (pixel >> 8) & 0xff;
                 int blue = (pixel) & 0xff;
 
-                red = (tekst[brojac] == 1) ? (byte) (red | 1) : (byte) (red & ~1);
-                green = (tekst[brojac+1] == 1) ? (byte) (green | 1) : (byte) (green & ~1);
-                blue = (tekst[brojac+2] == 1) ? (byte) (blue | 1) : (byte) (blue & ~1);
+                red = (tekst[brojac] == 1) ?  (red | 1) : (red & ~1);
+                green = (tekst[brojac+1] == 1) ?  (green | 1) : (green & ~1);
+                blue = (tekst[brojac+2] == 1) ?  (blue | 1) :  (blue & ~1);
                 
-                //ovde je greska
-                int value = alpha | red << 16 | green << 8 | blue;
+                int value = 0xFF000000+(red << 16) + (green << 8) + (blue);
                 image.setRGB(i, j, value);
                 brojac +=3;
             }
         }
         try {
+            //ImageIO.write(image, "png", new File(putanja));
             ImageIO.write(image, "png", new File("C:\\Users\\miroslav.mandic\\Desktop\\45.png"));
         } catch (Exception e) {
             e.printStackTrace();
@@ -79,9 +84,51 @@ public class Steganografija {
     }
     
     public void kodovanje(String tekst,String primalac){
-        byte [] tekstBiti = nizCharovaUnizBita(tekst);
-        byte [] primalacBiti = nizCharovaUnizBita(primalac);
-        int minimalnaVelicinaSLike = tekstBiti.length + primalacBiti.length + 512;
+        try{
+        PrivateKey  privateKey = Main.KORISNIK.getPrivateKey();
+        Cipher sifrat = Cipher.getInstance("RSA");
+        sifrat.init(Cipher.ENCRYPT_MODE, privateKey);
+
+        byte[] kriptovanTekst = sifrat.doFinal(tekst.getBytes("UTF-8"));
+        
+        //9*8 za smjestanje usenrame primaoca
+        byte [] tekstZaUpis = new byte[9*8 + kriptovanTekst.length];
+        tekstZaUpis = Arrays.copyOfRange(primalac.getBytes("utf-8"), 0, 9*8);
+        tekstZaUpis = Arrays.copyOfRange(tekstZaUpis, 9*8, tekstZaUpis.length);
+        
+        Sertifikat sert = new Sertifikat(Helper.SERTIFIKATI + primalac + ".der");
+        PublicKey publicKey = sert.getPublicKey();
+        sifrat.init(Cipher.ENCRYPT_MODE, publicKey);
+                
+        byte [] kriptovanTekstZaUpis = sifrat.doFinal(tekstZaUpis);
+        if(kriptovanTekstZaUpis.length > (2^21)){
+            new Poruka("Vasa poruka ne moze da sadrzi toliko slova","ERROR","ERROR");
+        }
+        else
+        {
+            int minimalnaVelicinaSLike = 8 * 3 + kriptovanTekstZaUpis.length * 8;
+            if ((minimalnaVelicinaSLike % 3) == 1) {
+                minimalnaVelicinaSLike += 2;
+            } else if ((minimalnaVelicinaSLike % 3) == 2) {
+                minimalnaVelicinaSLike++;
+            }
+            if (minimalnaVelicinaSLike > ((image.getHeight() + image.getWidth()) * 3))
+                new Poruka("Slika nije dovoljne velicine da bi se moglgla skladistiti data poruka u nju."
+                        + " Ili izaberite vecu sliku ili smanjite kolicinu teksta u poruci", "Error", "Error");
+            else{
+                
+                byte [] nizZaUpis = nizCharovaUnizBita(new String(kriptovanTekstZaUpis,"utf-8"));
+                byte [] duzinaPoruke = nizCharovaUnizBita(String.valueOf(kriptovanTekstZaUpis.length));
+                nizZaUpis = Arrays.copyOfRange(duzinaPoruke,0, 24);
+                nizZaUpis = Arrays.copyOfRange(kriptovanTekstZaUpis,24,nizZaUpis.length);
+                
+                upisiBiteUSliku(nizZaUpis,"");
+                
+            }
+        }
+        
+        }
+        catch(Exception  e){e.printStackTrace();}
         
     }
     
@@ -103,7 +150,7 @@ public class Steganografija {
       // get the BufferedImage, using the ImageIO class
       read(ImageIO.read(new File("C:\\Users\\miroslav.mandic\\Desktop\\456.png")));
       Steganografija a  = new Steganografija(new File("C:\\Users\\miroslav.mandic\\Desktop\\456.png"));
-      a.upisiBiteUSliku(a.nizCharovaUnizBita("asd"));
+      a.upisiBiteUSliku(a.nizCharovaUnizBita("asd"),"");
       read(ImageIO.read(new File("C:\\Users\\miroslav.mandic\\Desktop\\45.png")));
       
       
