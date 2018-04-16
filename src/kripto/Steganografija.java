@@ -152,13 +152,14 @@ public class Steganografija {
       Steganografija a  = new Steganografija(new File("C:\\Users\\miroslav.mandic\\Desktop\\456.png"));
       a.upisiBiteUSliku(a.nizCharovaUnizBita("asd"),"");
       read(ImageIO.read(new File("C:\\Users\\miroslav.mandic\\Desktop\\45.png")));
+
       
       
       
       
       
     } catch (IOException e) {
-      System.err.println(e.getMessage());
+      e.printStackTrace();
     }
     }
     
