@@ -7,6 +7,7 @@ package kripto;
 
 import java.io.File;
 import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -136,7 +137,7 @@ public class Login extends javax.swing.JDialog {
                     if (!u.keyMatch(txtPrivateKeyPath.getText())) {
                         new Poruka("Privatni kljuc ne odgovara vasem sertifikatu!", "ERROR", "ERROR");
                     } else {
-                        new Poruka("Uspjesno ste se ulogovali", "Info", "");
+                        //new Poruka("Uspjesno ste se ulogovali", "Info", "Info");
                         this.dispose();
                         MainForm mainForm = new MainForm();
                         mainForm.setLocationRelativeTo(null);
@@ -157,6 +158,7 @@ public class Login extends javax.swing.JDialog {
 
     private void btnGetPrivateKeyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGetPrivateKeyActionPerformed
         JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(new FileNameExtensionFilter("*.der","der"));
         fileChooser.setCurrentDirectory(new File ("src//privatniKljucevi"));
         StringBuilder sb = new StringBuilder();
         try {

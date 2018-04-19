@@ -76,8 +76,8 @@ public class Steganografija {
             }
         }
         try {
-            //ImageIO.write(image, "png", new File(putanja));
-            ImageIO.write(image, "png", new File("C:\\Users\\miroslav.mandic\\Desktop\\45.png"));
+            ImageIO.write(image, "png", new File(putanja));
+            //ImageIO.write(image, "png", new File("C:\\Users\\miroslav.mandic\\Desktop\\45.png"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -89,6 +89,7 @@ public class Steganografija {
         Cipher sifrat = Cipher.getInstance("RSA");
         sifrat.init(Cipher.ENCRYPT_MODE, privateKey);
 
+        //////// treba potpis a ne kriptovanje!!!!
         byte[] kriptovanTekst = sifrat.doFinal(tekst.getBytes("UTF-8"));
         
         //9*8 za smjestanje usenrame primaoca
@@ -116,13 +117,22 @@ public class Steganografija {
                 new Poruka("Slika nije dovoljne velicine da bi se moglgla skladistiti data poruka u nju."
                         + " Ili izaberite vecu sliku ili smanjite kolicinu teksta u poruci", "Error", "Error");
             else{
-                
-                byte [] nizZaUpis = nizCharovaUnizBita(new String(kriptovanTekstZaUpis,"utf-8"));
+                byte [] nizZaUpis = new byte[minimalnaVelicinaSLike];
                 byte [] duzinaPoruke = nizCharovaUnizBita(String.valueOf(kriptovanTekstZaUpis.length));
                 nizZaUpis = Arrays.copyOfRange(duzinaPoruke,0, 24);
-                nizZaUpis = Arrays.copyOfRange(kriptovanTekstZaUpis,24,nizZaUpis.length);
+                nizZaUpis = Arrays.copyOfRange(nizCharovaUnizBita(new String(kriptovanTekstZaUpis,"utf-8")),24,nizZaUpis.length);
                 
-                upisiBiteUSliku(nizZaUpis,"");
+                boolean jedinstvenoIme  = true;
+                String imeFajla;
+                do{
+                     imeFajla= Helper.getRandomString(20);
+                    File  [] sveSlikeKriptovane = new File("src//slike_kriptovane").listFiles();
+                    for(File a : sveSlikeKriptovane)
+                        if(a.getName().equals(imeFajla))
+                            jedinstvenoIme = false;
+                }
+                while(!jedinstvenoIme);
+                upisiBiteUSliku(nizZaUpis,imeFajla + ".png");
                 
             }
         }

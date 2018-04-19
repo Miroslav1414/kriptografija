@@ -23,6 +23,10 @@ import kripto.ListaSlika.Slika;
  * @author miroslav.mandic
  */
 public class MainForm extends javax.swing.JFrame {
+    
+    public String getStelectedUSer(){
+        return listUsers.getSelectedValue();
+    }
 
     public void popuniKorisnike(User user){
         ArrayList<User>  korisnici = new ArrayList<User>(Arrays.asList(Main.KORISNICI));
@@ -134,9 +138,15 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_listUsersMouseClicked
 
     private void btnPosaljiPorukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPosaljiPorukuActionPerformed
-        if("".equals(listUsers.getSelectedValue()))
-            new Poruka("PORUKA", "ERROR", "ERRPR");
-        else new Poruka(listUsers.getSelectedValue(), "Info", "Info");
+        if (listUsers.getSelectedIndex() == -1) {
+            new Poruka("Niste izabrali korisnika kome zelite da posaljete poruku", "Warrning", "Warrning");
+        } else {
+            PosaljiPoruku posaljiPoruku = new PosaljiPoruku(this);
+            posaljiPoruku.setLocationRelativeTo(null);
+            posaljiPoruku.setModal(true);
+            posaljiPoruku.setVisible(true);
+        }
+        
     }//GEN-LAST:event_btnPosaljiPorukuActionPerformed
 
     /**

@@ -53,10 +53,6 @@ pkcs8 -topk8 -inform PEM -outform DER -in kljucevi/miso_private_key.pem -out klj
 
 
 
-heshovan_potpis
-dekriptovanje
-
-username	heshovan_Password	lokacijaCertifikata_zbog_privatnog_kluca	ime		prezime
 
 
 pravim hesh funkcije
@@ -69,6 +65,7 @@ primalac pravi hesh dokumenta
 dekriptuje digitalni potpis privatnim kjucem
 
 provjerava jel ispravno sve?!
+
 
 
 
@@ -106,9 +103,21 @@ u slici se treba nalaziti:
 tekst kriptovan hesh 3DES algoritmom
 sifra i hes te poruke na pocetu
 
+//
+kriptujem tekst privatnim kljucem posiljaoca = K1
+posiljalac  (prvih 9*8 ) + K1   = kriptovanje koristenjem javnog kljuca primaoca = K2
+duzina + K2 - upis u sliku
 
 
-duzina teksta *8  + 256 za lozinku + 256 za hash + duzina usera (10*8)  === padding za +1 ili +2 / jer mora biti djeljivo sa 3!!!
+
+
+
+//ovo nije vise ovako
+8(duzina teksta koja se upisuje) + 
+duzina teksta *8  + 
+256 za lozinku + 
+256 za hash + 
+duzina usera (10*8)  === padding za +1 ili +2 / jer mora biti djeljivo sa 3!!!
 prvih 8 piksela odredjuje duzinu upisanog teksta!
 
 
