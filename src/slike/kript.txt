@@ -4,7 +4,6 @@ da li je CA_Certifikat validan
 da li je crl lista potpisana od strane CA_ certifikat i kako uopste to provjeriti (vjerovatno je potpisana privatnim lkljucem!)
 
 
-treba napraviti usera
 
 ime
 prezime
@@ -14,6 +13,14 @@ lokacija kljuca
 
 //da li treba provjeravati da li su javni i privatni kljuc u paru 
 //potpisati nesto i otvoriti i viditi da li je validno
+
+
+
+-informacije o crl listi
+crl -in file.crl -text
+
+-generisanje nove crl liste
+
 
 -CITAV PROCES
 genrsa -out kljucevi/miso_private_key.pem 2048
@@ -107,6 +114,20 @@ sifra i hes te poruke na pocetu
 kriptujem tekst privatnim kljucem posiljaoca = K1
 posiljalac  (prvih 9*8 ) + K1   = kriptovanje koristenjem javnog kljuca primaoca = K2
 duzina + K2 - upis u sliku
+
+
+//KODOVANJE U SLIKU:
+uzitavam privatni kljuc posiljaoca
+tekst kriptujem tim kljucem ///potpisivanje a ne kriptovanje
+pravi se tekstZaUpis = u 9 prvih bita upisujem primaoca + kriptovan tekst
+ucitava se javni kljuc primaoca
+tekstZaUpie se kriptuje tim kljucem
+provjera da li se duzina teksta moze snimiti u sliku
+pravi se  nizZaUpis = 24 bita(duzina teksta koja se upisuje) + prethodno kriptovan tekst
+duzina se pretvara u niz bita i upisuje u prve 24 pozicije
+kriptovan tekst se pretvara u niz bita i upisuje u ostale pozicije
+vrsi se upis u sliku gdje je data putanja do slike gdje se upisuje
+
 
 
 

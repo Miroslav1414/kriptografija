@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Signature;
 import java.util.Arrays;
 import javax.crypto.Cipher;
 import javax.imageio.ImageIO;
@@ -32,12 +33,23 @@ public class Steganografija {
     //karakter u niz od osam bajtova koji sadrzi samo po jedan bit
     public byte[] convertCharToBit(char ch){
         byte rez [] = new byte[8];
+        char cc = ch;
+        try{
         int brojac = 8;
             while (ch > 0)
             {
                 rez[--brojac] = (byte)(ch % 2);
                 ch /= 2;
             }
+        }
+        catch(Exception e){
+            System.out.println((int)cc);
+            for(byte a: rez)
+            System.out.print(a);
+            e.printStackTrace();
+        }
+            
+            
         return rez;
     }
     
@@ -86,11 +98,16 @@ public class Steganografija {
     public void kodovanje(String tekst,String primalac){
         try{
         PrivateKey  privateKey = Main.KORISNIK.getPrivateKey();
-        Cipher sifrat = Cipher.getInstance("RSA");
-        sifrat.init(Cipher.ENCRYPT_MODE, privateKey);
 
-        //////// treba potpis a ne kriptovanje!!!!
-        byte[] kriptovanTekst = sifrat.doFinal(tekst.getBytes("UTF-8"));
+        //potpisivanje
+        Signature potpis = Signature.getInstance("SHA256withRSA");
+        potpis.initSign(privateKey);
+        potpis.update(tekst.getBytes("UTF-8"));
+
+        byte[] kriptovanTekst = potpis.sign();
+        System.out.println(new String(kriptovanTekst,"utf-8"));
+
+        //return Base64.getEncoder().encodeToString(signature);
         
         //9*8 za smjestanje usenrame primaoca
         byte [] tekstZaUpis = new byte[9*8 + kriptovanTekst.length];
@@ -99,11 +116,15 @@ public class Steganografija {
         
         Sertifikat sert = new Sertifikat(Helper.SERTIFIKATI + primalac + ".der");
         PublicKey publicKey = sert.getPublicKey();
+        
+        Cipher sifrat = Cipher.getInstance("RSA");
         sifrat.init(Cipher.ENCRYPT_MODE, publicKey);
+        System.out.println(new String(tekstZaUpis,"utf-8"));
                 
         byte [] kriptovanTekstZaUpis = sifrat.doFinal(tekstZaUpis);
-        if(kriptovanTekstZaUpis.length > (2^21)){
-            new Poruka("Vasa poruka ne moze da sadrzi toliko slova","ERROR","ERROR");
+        if(kriptovanTekstZaUpis.length > (2097152)){
+            System.out.println(new String(kriptovanTekstZaUpis,"utf-8"));
+            new Poruka("Vasa poruka ne moze da sadrzi toliko slova." ,"ERROR","ERROR");
         }
         else
         {
