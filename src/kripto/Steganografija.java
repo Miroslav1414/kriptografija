@@ -22,6 +22,7 @@ public class Steganografija {
     
     public Steganografija(){}
     
+    //proslijedjuje se slika u koju ce se upisati podaci
     public Steganografija(File slika){
         try {
             image = ImageIO.read(slika);
@@ -43,9 +44,10 @@ public class Steganografija {
             }
         }
         catch(Exception e){
-            System.out.println((int)cc);
-            for(byte a: rez)
-            System.out.print(a);
+//            System.out.println((int)cc);
+//            for(byte a: rez)
+//            System.out.print(a);
+//            System.out.println("==================");
             e.printStackTrace();
         }
             
@@ -59,6 +61,25 @@ public class Steganografija {
         int brojac = 0;
         for (char ch : tekst.toCharArray()) {
             System.arraycopy(convertCharToBit(ch), 0, tekstUBajtovima, brojac, 8);
+            brojac += 8;
+        }
+        return tekstUBajtovima;
+    }
+    
+    //niz bajtova u niz bajtova po 1 bit
+    public byte[] nizCharovaUnizBita(byte[] tekst){
+        byte[] tekstUBajtovima = new byte[tekst.length * 8];
+        int brojac = 0;
+        int temp = 0;
+        for (byte ch : tekst) {
+            
+            if ( (int)ch <0) 
+            {
+                temp = ch;
+                System.arraycopy(convertCharToBit((char)(temp+256)), 0, tekstUBajtovima, brojac, 8);
+            }
+            else
+                System.arraycopy(convertCharToBit((char)ch), 0, tekstUBajtovima, brojac, 8);
             brojac += 8;
         }
         return tekstUBajtovima;
@@ -95,6 +116,14 @@ public class Steganografija {
         }
     }
     
+    public byte[] obrniNiz(byte [] niz){
+        byte [] rez = new byte[niz.length];
+        int brojac = 0;
+        for(int i =niz.length -1  ; i>=0 ; i++)
+            rez[brojac++]= niz[i];
+        return rez;
+    }
+    
     public void kodovanje(String tekst,String primalac){
         try{
         PrivateKey  privateKey = Main.KORISNIK.getPrivateKey();
@@ -102,16 +131,16 @@ public class Steganografija {
         //potpisivanje
         Signature potpis = Signature.getInstance("SHA256withRSA");
         potpis.initSign(privateKey);
-        potpis.update(tekst.getBytes("UTF-8"));
+        potpis.update(Helper.stringToByte(tekst));
 
         byte[] kriptovanTekst = potpis.sign();
-        System.out.println(new String(kriptovanTekst,"utf-8"));
+        //System.out.println(Helper.byteToString(kriptovanTekst));
 
-        //return Base64.getEncoder().encodeToString(signature);
+        //return Base64.getEncoder().encodeToString(signature);AAA
         
         //9*8 za smjestanje usenrame primaoca
         byte [] tekstZaUpis = new byte[9*8 + kriptovanTekst.length];
-        tekstZaUpis = Arrays.copyOfRange(primalac.getBytes("utf-8"), 0, 9*8);
+        tekstZaUpis = Arrays.copyOfRange(Helper.stringToByte(primalac), 0, 9*8);
         tekstZaUpis = Arrays.copyOfRange(tekstZaUpis, 9*8, tekstZaUpis.length);
         
         Sertifikat sert = new Sertifikat(Helper.SERTIFIKATI + primalac + ".der");
@@ -119,12 +148,12 @@ public class Steganografija {
         
         Cipher sifrat = Cipher.getInstance("RSA");
         sifrat.init(Cipher.ENCRYPT_MODE, publicKey);
-        System.out.println(new String(tekstZaUpis,"utf-8"));
+        System.out.println(Helper.byteToString(tekstZaUpis));
                 
         byte [] kriptovanTekstZaUpis = sifrat.doFinal(tekstZaUpis);
         if(kriptovanTekstZaUpis.length > (2097152)){
-            System.out.println(new String(kriptovanTekstZaUpis,"utf-8"));
-            new Poruka("Vasa poruka ne moze da sadrzi toliko slova." ,"ERROR","ERROR");
+            //System.out.println(Helper.byteToString(kriptovanTekstZaUpis));
+            new Poruka("Vasa poruka ne moze da sadrzi toliko slova. Maksimalna duzina teksta je 2097152 slova." ,"ERROR","ERROR");
         }
         else
         {
@@ -135,13 +164,14 @@ public class Steganografija {
                 minimalnaVelicinaSLike++;
             }
             if (minimalnaVelicinaSLike > ((image.getHeight() + image.getWidth()) * 3))
-                new Poruka("Slika nije dovoljne velicine da bi se moglgla skladistiti data poruka u nju."
+                new Poruka("Slika nije dovoljne velicine da bi se moglg skladistiti data poruka u nju."
                         + " Ili izaberite vecu sliku ili smanjite kolicinu teksta u poruci", "Error", "Error");
             else{
                 byte [] nizZaUpis = new byte[minimalnaVelicinaSLike];
                 byte [] duzinaPoruke = nizCharovaUnizBita(String.valueOf(kriptovanTekstZaUpis.length));
-                nizZaUpis = Arrays.copyOfRange(duzinaPoruke,0, 24);
-                nizZaUpis = Arrays.copyOfRange(nizCharovaUnizBita(new String(kriptovanTekstZaUpis,"utf-8")),24,nizZaUpis.length);
+                nizZaUpis = Arrays.copyOfRange(obrniNiz(duzinaPoruke),0, 24);
+                //nizZaUpis = Arrays.copyOfRange(nizCharovaUnizBita(Helper.byteToString(kriptovanTekstZaUpis)),24,nizZaUpis.length);
+                nizZaUpis = Arrays.copyOfRange(nizCharovaUnizBita(kriptovanTekstZaUpis),24,nizZaUpis.length);
                 
                 boolean jedinstvenoIme  = true;
                 String imeFajla;
@@ -153,13 +183,34 @@ public class Steganografija {
                             jedinstvenoIme = false;
                 }
                 while(!jedinstvenoIme);
-                upisiBiteUSliku(nizZaUpis,imeFajla + ".png");
+                upisiBiteUSliku(nizZaUpis,"src//slike_kriptovane//" + imeFajla + ".png");
                 
             }
         }
         
         }
         catch(Exception  e){e.printStackTrace();}
+        
+    }
+    
+    public int getDuzinaPoruke(BufferedImage im){
+        int rez = 0,brojac = 0;
+        for(int i = 0;i<im.getWidth();i++){
+            for (int j = 0; j<im.getHeight(); j++){
+                
+            }
+        }
+        return rez;
+    }
+    
+    
+    public void dekodovanje (String putanjaDoslike) {
+        try{
+            BufferedImage slikaDekripcija =(ImageIO.read(new File(putanjaDoslike)));
+            
+        }
+        catch(Exception e){e.printStackTrace();}
+        
         
     }
     
