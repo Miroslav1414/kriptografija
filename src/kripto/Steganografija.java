@@ -119,7 +119,7 @@ public class Steganografija {
     public byte[] obrniNiz(byte [] niz){
         byte [] rez = new byte[niz.length];
         int brojac = 0;
-        for(int i =niz.length -1  ; i>=0 ; i++)
+        for(int i =niz.length -1  ; i>=0 ; i--)
             rez[brojac++]= niz[i];
         return rez;
     }
@@ -170,6 +170,8 @@ public class Steganografija {
                 byte [] nizZaUpis = new byte[minimalnaVelicinaSLike];
                 byte [] duzinaPoruke = nizCharovaUnizBita(String.valueOf(kriptovanTekstZaUpis.length));
                 nizZaUpis = Arrays.copyOfRange(obrniNiz(duzinaPoruke),0, 24);
+                for(byte b : obrniNiz(duzinaPoruke))
+                    System.out.print(Byte.toString(b));
                 //nizZaUpis = Arrays.copyOfRange(nizCharovaUnizBita(Helper.byteToString(kriptovanTekstZaUpis)),24,nizZaUpis.length);
                 nizZaUpis = Arrays.copyOfRange(nizCharovaUnizBita(kriptovanTekstZaUpis),24,nizZaUpis.length);
                 
@@ -203,13 +205,45 @@ public class Steganografija {
         return rez;
     }
     
+    public byte [] citajPixele(int pixel){
+        byte [] rez = new byte[3];
+        
+        int red = (pixel >> 16) & 0xff;
+        int green = (pixel >> 8) & 0xff;
+        int blue = (pixel) & 0xff;
+
+        rez[0] = (byte)( red%2);
+        rez[1] = (byte)( green%2);
+        rez[2] = (byte)( blue%2);
+        return rez;
+    }
     
     public void dekodovanje (String putanjaDoslike) {
+        int prvih8Bita = 0,i=0,j=0;
         try{
             BufferedImage slikaDekripcija =(ImageIO.read(new File(putanjaDoslike)));
             
+            byte [] duzinaPoruke= new byte[24];
+            int pozicija = 0;
+            for(;i<slikaDekripcija.getWidth();i++)
+            {
+                for(; j<slikaDekripcija.getHeight();j++){
+                    if (prvih8Bita ==8) break;
+                    System.arraycopy(duzinaPoruke, pozicija,citajPixele(slikaDekripcija.getRGB(i, j)),0,3);
+                    pozicija +=3;
+                    prvih8Bita ++;
+                }
+            }
+            
+            for(byte b : obrniNiz(duzinaPoruke))
+                    System.out.print(Byte.toString(b));
+            
+            
+            
+            
         }
-        catch(Exception e){e.printStackTrace();}
+        catch(Exception e){e.printStackTrace();
+                System.out.println(prvih8Bita);}
         
         
     }
@@ -230,17 +264,24 @@ public class Steganografija {
     public static void main(String [] args){
         try {
       // get the BufferedImage, using the ImageIO class
-      read(ImageIO.read(new File("C:\\Users\\miroslav.mandic\\Desktop\\456.png")));
-      Steganografija a  = new Steganografija(new File("C:\\Users\\miroslav.mandic\\Desktop\\456.png"));
-      a.upisiBiteUSliku(a.nizCharovaUnizBita("asd"),"");
-      read(ImageIO.read(new File("C:\\Users\\miroslav.mandic\\Desktop\\45.png")));
+//      read(ImageIO.read(new File("C:\\Users\\miroslav.mandic\\Desktop\\456.png")));
+//      Steganografija a  = new Steganografija(new File("C:\\Users\\miroslav.mandic\\Desktop\\456.png"));
+//      a.upisiBiteUSliku(a.nizCharovaUnizBita("asd"),"");
+//      read(ImageIO.read(new File("C:\\Users\\miroslav.mandic\\Desktop\\45.png")));
+      
+      Steganografija asd  = new Steganografija();
+      asd.dekodovanje("src//slike_kriptovane//RAlOTiRlpnyzw6VJJ0PA.png");
+//      byte a = (byte)(201%2);
+//      byte b = (byte)(200%2);
+//      
+//      System.out.println(Byte.toString(a)  + "  " + Byte.toString(b));
 
       
       
       
       
       
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
     }
