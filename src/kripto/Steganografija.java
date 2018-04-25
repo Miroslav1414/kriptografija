@@ -140,8 +140,10 @@ public class Steganografija {
         
         //9*8 za smjestanje usenrame primaoca
         byte [] tekstZaUpis = new byte[9*8 + kriptovanTekst.length];
-        tekstZaUpis = Arrays.copyOfRange(Helper.stringToByte(primalac), 0, 9*8);
-        tekstZaUpis = Arrays.copyOfRange(tekstZaUpis, 9*8, tekstZaUpis.length);
+        System.arraycopy(Helper.stringToByte(primalac),0,tekstZaUpis,0,9*8);
+        //tekstZaUpis = Arrays.copyOfRange(Helper.stringToByte(primalac), 0, 9*8);
+        System.arraycopy(kriptovanTekst,0,tekstZaUpis,9*8,tekstZaUpis.length);
+        //tekstZaUpis = Arrays.copyOfRange(kriptovanTekst, 9*8, tekstZaUpis.length);
         
         Sertifikat sert = new Sertifikat(Helper.SERTIFIKATI + primalac + ".der");
         PublicKey publicKey = sert.getPublicKey();
@@ -215,6 +217,7 @@ public class Steganografija {
         rez[0] = (byte)( red%2);
         rez[1] = (byte)( green%2);
         rez[2] = (byte)( blue%2);
+        //System.out.println(rez[0] + " " +rez[1] + " " +rez[2] + "---" + red +" " + green + " " + blue);
         return rez;
     }
     
@@ -229,7 +232,7 @@ public class Steganografija {
             {
                 for(; j<slikaDekripcija.getHeight();j++){
                     if (prvih8Bita ==8) break;
-                    System.arraycopy(duzinaPoruke, pozicija,citajPixele(slikaDekripcija.getRGB(i, j)),0,3);
+                    System.arraycopy(citajPixele(slikaDekripcija.getRGB(i, j)),0,duzinaPoruke, pozicija,3);
                     pozicija +=3;
                     prvih8Bita ++;
                 }
