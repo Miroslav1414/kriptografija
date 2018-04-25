@@ -151,7 +151,7 @@ public class PosaljiPoruku extends javax.swing.JDialog {
             new Poruka("Unesite poruku!", "Info", "Info");
         else{
             Steganografija steg = new Steganografija(new File(txtPutanjaDoSlike.getText()));
-            steg.kodovanje("Datum slanja:/n" + labelDatum + "/nPoruka:/n" + txtPoruka, labelPrimalac.getText());
+            steg.kodovanje("Datum slanja:\n" + labelDatum.getText() + "\nPoruka:\n" + txtPoruka.getText(), labelPrimalac.getText());
         }
     }//GEN-LAST:event_btnPosaljiPorukuActionPerformed
 

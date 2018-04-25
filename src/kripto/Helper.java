@@ -5,6 +5,7 @@
  */
 package kripto;
 
+import static java.lang.Math.pow;
 import java.util.Random;
 
 /**
@@ -44,6 +45,25 @@ public class Helper {
             rez += (char)(a);
         return rez;
     }
+    
+    public static int nizBitaUInt(byte [] niz){
+        int rez = 0;
+        byte [] temp = obrniNiz(niz);
+        int stepen = temp.length;
+                for(byte a : temp){
+                    rez += pow(2,stepen)* a;
+                    stepen --;
+                    System.out.println(pow(2,stepen)* a);
+                }        
+        return rez;
+    }
+    
+    public static byte[] obrniNiz(byte [] niz){
+        byte [] rez = new byte[niz.length];
+        int brojac = 0;
+        for(int i =niz.length -1  ; i>=0 ; i--)
+            rez[brojac++]= niz[i];
+        return rez;}
     
     public static void main (String args []){
         byte a = (byte) 72;

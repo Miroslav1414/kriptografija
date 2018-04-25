@@ -8,6 +8,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.util.Arrays;
+import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.imageio.ImageIO;
 import kripto.ListaSlika.Slika;
@@ -116,16 +117,11 @@ public class Steganografija {
         }
     }
     
-    public byte[] obrniNiz(byte [] niz){
-        byte [] rez = new byte[niz.length];
-        int brojac = 0;
-        for(int i =niz.length -1  ; i>=0 ; i--)
-            rez[brojac++]= niz[i];
-        return rez;
-    }
+    
     
     public void kodovanje(String tekst,String primalac){
         try{
+        System.out.println(tekst);
         PrivateKey  privateKey = Main.KORISNIK.getPrivateKey();
 
         //potpisivanje
@@ -136,14 +132,15 @@ public class Steganografija {
         byte[] kriptovanTekst = potpis.sign();
         //System.out.println(Helper.byteToString(kriptovanTekst));
 
-        //return Base64.getEncoder().encodeToString(signature);AAA
+        byte [] niz64 = Base64.getEncoder().encode(kriptovanTekst);
         
-        //9*8 za smjestanje usenrame primaoca
-        byte [] tekstZaUpis = new byte[9*8 + kriptovanTekst.length];
-        System.arraycopy(Helper.stringToByte(primalac),0,tekstZaUpis,0,9*8);
-        //tekstZaUpis = Arrays.copyOfRange(Helper.stringToByte(primalac), 0, 9*8);
-        System.arraycopy(kriptovanTekst,0,tekstZaUpis,9*8,tekstZaUpis.length);
-        //tekstZaUpis = Arrays.copyOfRange(kriptovanTekst, 9*8, tekstZaUpis.length);
+        
+        byte [] tekstZaUpis = new byte[1 + primalac.length() + niz64.length];
+        byte [] brojSlovaPrimaoca = new byte[1];
+        brojSlovaPrimaoca = Helper.stringToByte(String.valueOf(primalac.length()));
+        System.arraycopy(brojSlovaPrimaoca,0,tekstZaUpis,0,1);
+        System.arraycopy(Helper.stringToByte(primalac),0,tekstZaUpis,1,primalac.length());
+        System.arraycopy(niz64,0,tekstZaUpis,(primalac.length()+1),niz64.length);
         
         Sertifikat sert = new Sertifikat(Helper.SERTIFIKATI + primalac + ".der");
         PublicKey publicKey = sert.getPublicKey();
@@ -171,11 +168,14 @@ public class Steganografija {
             else{
                 byte [] nizZaUpis = new byte[minimalnaVelicinaSLike];
                 byte [] duzinaPoruke = nizCharovaUnizBita(String.valueOf(kriptovanTekstZaUpis.length));
-                nizZaUpis = Arrays.copyOfRange(obrniNiz(duzinaPoruke),0, 24);
-                for(byte b : obrniNiz(duzinaPoruke))
+                System.arraycopy(Helper.obrniNiz(duzinaPoruke),0,nizZaUpis,0,24);
+                //nizZaUpis = Arrays.copyOfRange(obrniNiz(duzinaPoruke),0, 24);
+                for(byte b : Helper.obrniNiz(duzinaPoruke))
                     System.out.print(Byte.toString(b));
                 //nizZaUpis = Arrays.copyOfRange(nizCharovaUnizBita(Helper.byteToString(kriptovanTekstZaUpis)),24,nizZaUpis.length);
-                nizZaUpis = Arrays.copyOfRange(nizCharovaUnizBita(kriptovanTekstZaUpis),24,nizZaUpis.length);
+                //nizZaUpis = Arrays.copyOfRange(nizCharovaUnizBita(kriptovanTekstZaUpis),24,nizZaUpis.length);
+                byte [] temp = nizCharovaUnizBita(kriptovanTekstZaUpis);
+                System.arraycopy(temp,0,nizZaUpis,24,temp.length);
                 
                 boolean jedinstvenoIme  = true;
                 String imeFajla;
@@ -238,8 +238,11 @@ public class Steganografija {
                 }
             }
             
-            for(byte b : obrniNiz(duzinaPoruke))
+            for(byte b : (duzinaPoruke))
                     System.out.print(Byte.toString(b));
+            
+            int duzinaPorukeInt = Helper.nizBitaUInt(Helper.obrniNiz(duzinaPoruke));
+            System.out.println(duzinaPorukeInt);
             
             
             
@@ -273,7 +276,7 @@ public class Steganografija {
 //      read(ImageIO.read(new File("C:\\Users\\miroslav.mandic\\Desktop\\45.png")));
       
       Steganografija asd  = new Steganografija();
-      asd.dekodovanje("src//slike_kriptovane//RAlOTiRlpnyzw6VJJ0PA.png");
+      asd.dekodovanje("src//slike_kriptovane//ksHiJigyEjPfIkEn5T7n.png");
 //      byte a = (byte)(201%2);
 //      byte b = (byte)(200%2);
 //      
