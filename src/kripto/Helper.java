@@ -49,11 +49,10 @@ public class Helper {
     public static int nizBitaUInt(byte [] niz){
         int rez = 0;
         byte [] temp = obrniNiz(niz);
-        int stepen = temp.length;
+        int stepen = temp.length-1;
                 for(byte a : temp){
                     rez += pow(2,stepen)* a;
                     stepen --;
-                    System.out.println(pow(2,stepen)* a);
                 }        
         return rez;
     }
@@ -77,5 +76,16 @@ public class Helper {
         }
         System.out.println(byteToString(aa));
         
+    }
+    
+    public static byte[] intToByte(int a){
+        byte[] rez = new byte[24];
+        int brojac = 0;
+        while (a != 0){
+            rez[brojac++] = (byte)(a%2);
+            a/=2;
+        }        
+            
+        return rez;
     }
 }

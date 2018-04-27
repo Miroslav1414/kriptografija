@@ -187,14 +187,9 @@ public class Steganografija {
                         + " Ili izaberite vecu sliku ili smanjite kolicinu teksta u poruci", "Error", "Error");
             else{
                 byte [] nizZaUpis = new byte[minimalnaVelicinaSLike];
-                byte [] duzinaPoruke = nizCharovaUnizBita(String.valueOf(kriptovanTekstZaUpis.length));
-                System.arraycopy(Helper.obrniNiz(duzinaPoruke),0,nizZaUpis,0,24);
-                System.out.println(String.valueOf(kriptovanTekstZaUpis.length));
-                System.out.println(minimalnaVelicinaSLike);
-                System.out.println(kriptovanTekstZaUpis.length);
-                
-                for(byte b : Helper.obrniNiz(duzinaPoruke))
-                    System.out.print(Byte.toString(b));
+                byte [] duzinaPoruke = Helper.intToByte(kriptovanTekstZaUpis.length);
+                System.arraycopy(duzinaPoruke,0,nizZaUpis,0,24);
+//                              
                 byte [] temp = nizCharovaUnizBita(kriptovanTekstZaUpis);
                 System.arraycopy(temp,0,nizZaUpis,24,temp.length);
                 
@@ -238,7 +233,6 @@ public class Steganografija {
         rez[0] = (byte)( red%2);
         rez[1] = (byte)( green%2);
         rez[2] = (byte)( blue%2);
-        //System.out.println(rez[0] + " " +rez[1] + " " +rez[2] + "---" + red +" " + green + " " + blue);
         return rez;
     }
     
@@ -249,28 +243,63 @@ public class Steganografija {
             
             byte [] duzinaPoruke= new byte[24];
             int pozicija = 0;
-            for(;i<slikaDekripcija.getWidth();i++)
+            
+            //cita duzinu upisanih podataka
+            for(;i<slikaDekripcija.getWidth() && prvih8Bita !=8;i++)
             {
-                for(; j<slikaDekripcija.getHeight();j++){
-                    if (prvih8Bita ==8) break;
+                for(; j<slikaDekripcija.getHeight() && prvih8Bita !=8;j++){
+                    //if () return;
                     System.arraycopy(citajPixele(slikaDekripcija.getRGB(i, j)),0,duzinaPoruke, pozicija,3);
                     pozicija +=3;
                     prvih8Bita ++;
                 }
             }
+            int duzinaPorukeInt = Helper.nizBitaUInt(duzinaPoruke);
+            int duzinaPorukeIntPocetna = duzinaPorukeInt;
             
-            for(byte b : (duzinaPoruke))
-                    System.out.print(Byte.toString(b));
+            //cita ostale bite
+            if (duzinaPorukeInt%3 == 1) duzinaPorukeInt+=2;
+            else if (duzinaPorukeInt%3 == 2) duzinaPorukeInt++;
             
-            int duzinaPorukeInt = Helper.nizBitaUInt(Helper.obrniNiz(duzinaPoruke));
-            System.out.println(duzinaPorukeInt);
             
+            pozicija = 0;
+            
+            byte[] kriptovanTekst = new byte[duzinaPorukeInt];
+            
+            i--;j--;
+            for(;i<slikaDekripcija.getWidth() && pozicija != duzinaPorukeInt;i++)
+            {
+                for(; j<slikaDekripcija.getHeight() && pozicija != duzinaPorukeInt;j++){
+                    System.arraycopy(citajPixele(slikaDekripcija.getRGB(i, j)),0,kriptovanTekst, pozicija,3);
+                    pozicija +=3;
+                }
+            }
+            //brise visak
+            kriptovanTekst = Arrays.copyOf(kriptovanTekst, duzinaPorukeIntPocetna);
+            byte duzinaLozinkeBit = kriptovanTekst[0];
+            int duzinaLozinke = 0;
+            switch (duzinaLozinkeBit){
+            case 1 : duzinaLozinke = 64; break;
+            case 2: duzinaLozinke = 128; break;
+            case 3: duzinaLozinke = 256; break;
+            case 4: duzinaLozinke = 512; break;
+            case 5: duzinaLozinke = 1024; break;
+            case 6: duzinaLozinke = 2048; break;
+        }
+            byte [] lozinkaZaDes = new byte[duzinaLozinke];
+            for (int k =1; k<= duzinaLozinke; k++)
+                lozinkaZaDes[k-1] = kriptovanTekst[k];
+            byte [] desKriptovanTekst = Arrays.copyOfRange(kriptovanTekst, (1+ duzinaLozinke) , kriptovanTekst.length);
+            Cipher sifrat = Cipher.getInstance("RSA");
+            PrivateKey privatekey = Main.KORISNIK.getPrivateKey();
+            sifrat.init(Cipher.DECRYPT_MODE, privatekey);
+            byte [] rez = sifrat.doFinal();
             
             
             
         }
         catch(Exception e){e.printStackTrace();
-                System.out.println(prvih8Bita);}
+                }
         
         
     }
@@ -290,40 +319,9 @@ public class Steganografija {
     
     public static void main(String [] args){
         try {
-      // get the BufferedImage, using the ImageIO class
-//      read(ImageIO.read(new File("C:\\Users\\miroslav.mandic\\Desktop\\456.png")));
-//      Steganografija a  = new Steganografija(new File("C:\\Users\\miroslav.mandic\\Desktop\\456.png"));
-//      a.upisiBiteUSliku(a.nizCharovaUnizBita("asd"),"");
-//      read(ImageIO.read(new File("C:\\Users\\miroslav.mandic\\Desktop\\45.png")));
-      
-//      Steganografija asd  = new Steganografija();
-//      asd.dekodovanje("src//slike_kriptovane//ksHiJigyEjPfIkEn5T7n.png");
-      
-      
-//      byte a = (byte)(201%2);
-//      byte b = (byte)(200%2);
-//      
-//      System.out.println(Byte.toString(a)  + "  " + Byte.toString(b));
-            
-            Sertifikat sert = new Sertifikat(Helper.SERTIFIKATI + "admin" + ".der");
-        PublicKey publicKey = sert.getPublicKey();
-            Cipher sifrat = Cipher.getInstance("RSA/ECB/OAEPWithSHA-1AndMGF1Padding");
-        sifrat.init(Cipher.ENCRYPT_MODE, publicKey);
-        for(int i = 0 ;i <10;i++){
-        byte [] lozinka = sifrat.doFinal(Helper.stringToByte(Helper.getRandomString(20)));
-        System.out.println(lozinka.length);
-//        byte [] n = String.valueOf(257).getBytes();
-//        System.out.println(n.length);
-//        for(byte a : n)
-//            System.out.print(a + " ");
-        
-        }
-
-      
-      
-      
-      
-      
+      Steganografija asd  = new Steganografija();
+      asd.dekodovanje("src//slike_kriptovane//jcoRYLocayYmuE7L7P3i.png");
+ 
     } catch (Exception e) {
       e.printStackTrace();
     }

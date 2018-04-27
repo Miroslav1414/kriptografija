@@ -66,6 +66,7 @@ public class MainForm extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         listUsers = new javax.swing.JList<String>();
         btnPosaljiPoruku = new javax.swing.JButton();
+        btnDekript = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -92,6 +93,13 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
+        btnDekript.setText("Dekriptuj");
+        btnDekript.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDekriptActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -101,7 +109,9 @@ public class MainForm extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 367, Short.MAX_VALUE)
+                        .addGap(78, 78, 78)
+                        .addComponent(btnDekript)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 212, Short.MAX_VALUE)
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 312, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(22, 22, 22))
                     .addGroup(layout.createSequentialGroup()
@@ -118,9 +128,11 @@ public class MainForm extends javax.swing.JFrame {
                 .addGap(31, 31, 31)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1))
+                    .addComponent(btnDekript))
                 .addGap(18, 18, 18)
                 .addComponent(btnPosaljiPoruku)
                 .addContainerGap(118, Short.MAX_VALUE))
@@ -148,6 +160,16 @@ public class MainForm extends javax.swing.JFrame {
         }
         
     }//GEN-LAST:event_btnPosaljiPorukuActionPerformed
+
+    private void btnDekriptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDekriptActionPerformed
+        try {
+            Steganografija asd = new Steganografija();
+            asd.dekodovanje("src//slike_kriptovane//jcoRYLocayYmuE7L7P3i.png");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_btnDekriptActionPerformed
 
     /**
      * @param args the command line arguments
@@ -188,6 +210,7 @@ public class MainForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnDekript;
     private javax.swing.JButton btnPosaljiPoruku;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
