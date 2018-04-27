@@ -45,16 +45,22 @@ public class Steganografija {
             }
         }
         catch(Exception e){
-//            System.out.println((int)cc);
-//            for(byte a: rez)
-//            System.out.print(a);
-//            System.out.println("==================");
             e.printStackTrace();
         }
             
             
         return rez;
     }
+    
+//    public String convertBitToString(byte [] niz){
+//        String rez = "";
+//        for(i=0; i<niz.length ; i+=8)
+//            rez += (char)
+//        
+//        
+//        
+//        return rez;
+//    }
     
     //string u bitove - odnosno niz bajtova po bit
     public byte[] nizCharovaUnizBita(String tekst){
