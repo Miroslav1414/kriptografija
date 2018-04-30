@@ -282,6 +282,8 @@ public class Steganografija {
             }
             //brise visak
             kriptovanTekst = Arrays.copyOf(kriptovanTekst, duzinaPorukeIntPocetna);
+            
+            //duzina des kljuca se trazi koji je kriptovan javnim kljucem primaoca
             byte duzinaLozinkeBit = kriptovanTekst[0];
             int duzinaLozinke = 0;
             switch (duzinaLozinkeBit){
@@ -299,7 +301,9 @@ public class Steganografija {
             Cipher sifrat = Cipher.getInstance("RSA");
             PrivateKey privatekey = Main.KORISNIK.getPrivateKey();
             sifrat.init(Cipher.DECRYPT_MODE, privatekey);
-            byte [] rez = sifrat.doFinal();
+            for (byte a : lozinkaZaDes)
+                System.out.print(a);
+            byte [] rez = sifrat.doFinal(lozinkaZaDes);
             
             
             
@@ -326,7 +330,7 @@ public class Steganografija {
     public static void main(String [] args){
         try {
       Steganografija asd  = new Steganografija();
-      asd.dekodovanje("src//slike_kriptovane//jcoRYLocayYmuE7L7P3i.png");
+      asd.dekodovanje("src//slike_kriptovane//rUiVP80mVg2PFT7kmUWs.png");
  
     } catch (Exception e) {
       e.printStackTrace();
