@@ -134,26 +134,40 @@ public class Steganografija {
         Signature potpis = Signature.getInstance("SHA256withRSA");
         potpis.initSign(privateKey);
         potpis.update(Helper.stringToByte(tekst));
+        
+        System.out.println("TEKST:");
+        System.out.println(tekst);
 
         byte[] kriptovanTekst = potpis.sign();
-//        System.out.println("POTPISAN TEKST!");
-//        System.out.println(Helper.byteToString(kriptovanTekst));
+        System.out.println("\n======\nPOTPISAN TEKST!");
+        System.out.println(Helper.byteToString(kriptovanTekst));
 
         byte [] niz64 = Base64.getEncoder().encode(kriptovanTekst);
         
+                System.out.println("\n======\nPOTPISAN TEKST 64!");
+        System.out.println(Helper.byteToString(kriptovanTekst));
+        
         
         byte [] tekstZaUpis = new byte[1 + primalac.length() + niz64.length];
+        
+        
         byte [] brojSlovaPrimaoca = new byte[1];
         brojSlovaPrimaoca = Helper.stringToByte(String.valueOf(primalac.length()));
         System.arraycopy(brojSlovaPrimaoca,0,tekstZaUpis,0,1);
         System.arraycopy(Helper.stringToByte(primalac),0,tekstZaUpis,1,primalac.length());
         System.arraycopy(niz64,0,tekstZaUpis,(primalac.length()+1),niz64.length);
         
+        
+                System.out.println("\n----------");
+                for (byte a : tekstZaUpis)
+                System.out.print(a);
+                System.out.println("\n----------");
+        
         Sertifikat sert = new Sertifikat(Helper.SERTIFIKATI + primalac + ".der");
         PublicKey publicKey = sert.getPublicKey();
         
-//        System.out.println("tekst za upis!");
-//        System.out.println(Helper.byteToString(tekstZaUpis));
+        System.out.println("tekst za upis! Pomocu metode");
+        System.out.println(Helper.byteToString(tekstZaUpis));
         
         String desLozinka = Helper.getRandomString(10);
         byte [] desKriptovanTekst = new TripleDES().encrypt(Helper.byteToString(tekstZaUpis), desLozinka);
@@ -173,6 +187,11 @@ public class Steganografija {
         desLozinkaISifrat[0]= duzinaLozinke;
         System.arraycopy(lozinka,0,desLozinkaISifrat,1,lozinka.length);
         System.arraycopy(desKriptovanTekst,0,desLozinkaISifrat,lozinka.length + 1 ,desKriptovanTekst.length);
+        
+        System.out.println("\n----------\nDes Lozinka i sifrat");
+                for (byte a : desLozinkaISifrat)
+                System.out.print(a);
+                System.out.println("\n----------");
         
         byte [] kriptovanTekstZaUpis = desLozinkaISifrat;
         
@@ -195,9 +214,15 @@ public class Steganografija {
                 byte [] nizZaUpis = new byte[minimalnaVelicinaSLike];
                 byte [] duzinaPoruke = Helper.intToByte(kriptovanTekstZaUpis.length);
                 System.arraycopy(duzinaPoruke,0,nizZaUpis,0,24);
-//                              
+
+//                System.out.println("----------");
+//                for (byte a : kriptovanTekstZaUpis)
+//                    System.out.print(a);
+//                System.out.println("\n----------");
                 byte [] temp = nizCharovaUnizBita(kriptovanTekstZaUpis);
                 System.arraycopy(temp,0,nizZaUpis,24,temp.length);
+                for (byte a : nizZaUpis)
+                    System.out.print(a);
                 
                 boolean jedinstvenoIme  = true;
                 String imeFajla;
@@ -251,10 +276,11 @@ public class Steganografija {
             int pozicija = 0;
             
             //cita duzinu upisanih podataka
-            for(;i<slikaDekripcija.getWidth() && prvih8Bita !=8;i++)
+            petlja_1:
+            for(;i<slikaDekripcija.getWidth();i++)
             {
-                for(; j<slikaDekripcija.getHeight() && prvih8Bita !=8;j++){
-                    //if () return;
+                for(; j<slikaDekripcija.getHeight() ;j++){
+                    if (prvih8Bita >=8) break petlja_1;
                     System.arraycopy(citajPixele(slikaDekripcija.getRGB(i, j)),0,duzinaPoruke, pozicija,3);
                     pozicija +=3;
                     prvih8Bita ++;
@@ -272,10 +298,11 @@ public class Steganografija {
             
             byte[] kriptovanTekst = new byte[duzinaPorukeInt];
             
-            i--;j--;
-            for(;i<slikaDekripcija.getWidth() && pozicija != duzinaPorukeInt;i++)
+            petlja_2:
+            for(;i<slikaDekripcija.getWidth();i++)
             {
-                for(; j<slikaDekripcija.getHeight() && pozicija != duzinaPorukeInt;j++){
+                for(; j<slikaDekripcija.getHeight();j++){
+                    if (pozicija >= duzinaPorukeInt) break petlja_2;
                     System.arraycopy(citajPixele(slikaDekripcija.getRGB(i, j)),0,kriptovanTekst, pozicija,3);
                     pozicija +=3;
                 }
@@ -284,7 +311,10 @@ public class Steganografija {
             kriptovanTekst = Arrays.copyOf(kriptovanTekst, duzinaPorukeIntPocetna);
             
             //duzina des kljuca se trazi koji je kriptovan javnim kljucem primaoca
-            byte duzinaLozinkeBit = kriptovanTekst[0];
+            byte [] duzinaLozinkeNiz = new byte [8];
+            System.arraycopy(kriptovanTekst,0,duzinaLozinkeNiz, 0,8);
+            
+            int duzinaLozinkeBit = Helper.nizBitaUInt(Helper.obrniNiz(duzinaLozinkeNiz));
             int duzinaLozinke = 0;
             switch (duzinaLozinkeBit){
             case 1 : duzinaLozinke = 64; break;

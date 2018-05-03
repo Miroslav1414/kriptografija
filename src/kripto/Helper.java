@@ -57,28 +57,19 @@ public class Helper {
         return rez;
     }
     
+    public byte [] nizBitaUNizBajta(byte [] niz ){
+        byte [] rez = new byte [niz.length /8];
+        return rez;
+    }
+    
     public static byte[] obrniNiz(byte [] niz){
         byte [] rez = new byte[niz.length];
         int brojac = 0;
         for(int i =niz.length -1  ; i>=0 ; i--)
             rez[brojac++]= niz[i];
         return rez;}
-    
-    public static void main (String args []){
-        byte a = (byte) 72;
-        byte [] aa = {(byte)-255};
-        System.out.println((char)255);
-        System.out.println(Byte.toString(a) + " " + aa[0]);
-        while(a != (byte)0)
-        {
-            System.out.print(a%2);
-            a/=2;
-        }
-        System.out.println(byteToString(aa));
-        
-    }
-    
-    public static byte[] intToByte(int a){
+
+      public static byte[] intToByte(int a){
         byte[] rez = new byte[24];
         int brojac = 0;
         while (a != 0){
