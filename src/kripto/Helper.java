@@ -46,6 +46,11 @@ public class Helper {
         return rez;
     }
     
+    public static byte nizButaUByte(byte [] niz ){
+        byte rez = (byte) (niz[0]* 128  + niz[1] * 64 + niz[2] * 32 + niz[3] *16 + niz[4]*8 + niz[5] * 4 + niz[6] * 2 + niz[7]);
+        return rez;
+    }
+    
     public static int nizBitaUInt(byte [] niz){
         int rez = 0;
         byte [] temp = obrniNiz(niz);

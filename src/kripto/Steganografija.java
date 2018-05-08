@@ -286,7 +286,7 @@ public class Steganografija {
                     prvih8Bita ++;
                 }
             }
-            int duzinaPorukeInt = Helper.nizBitaUInt(duzinaPoruke);
+            int duzinaPorukeInt = Helper.nizBitaUInt(duzinaPoruke)*8;
             int duzinaPorukeIntPocetna = duzinaPorukeInt;
             
             //cita ostale bite
@@ -307,14 +307,20 @@ public class Steganografija {
                     pozicija +=3;
                 }
             }
-            //brise visak
+            //brise visak            
             kriptovanTekst = Arrays.copyOf(kriptovanTekst, duzinaPorukeIntPocetna);
             
-            //duzina des kljuca se trazi koji je kriptovan javnim kljucem primaoca
-            byte [] duzinaLozinkeNiz = new byte [8];
-            System.arraycopy(kriptovanTekst,0,duzinaLozinkeNiz, 0,8);
+            //pretvara bite u bajte
+            byte [] nizBajtova= new byte [duzinaPorukeIntPocetna];
+            pozicija = 0;
+        
+            for (int k = 0; k<duzinaPorukeIntPocetna;k+=8){
+                nizBajtova[pozicija++] = Helper.nizButaUByte(Arrays.copyOfRange(kriptovanTekst, k, k+8));
+            }
             
-            int duzinaLozinkeBit = Helper.nizBitaUInt(Helper.obrniNiz(duzinaLozinkeNiz));
+            //duzina des kljuca se trazi koji je kriptovan javnim kljucem primaoca
+                        
+            int duzinaLozinkeBit = nizBajtova[0];
             int duzinaLozinke = 0;
             switch (duzinaLozinkeBit){
             case 1 : duzinaLozinke = 64; break;
@@ -326,13 +332,12 @@ public class Steganografija {
         }
             byte [] lozinkaZaDes = new byte[duzinaLozinke];
             for (int k =1; k<= duzinaLozinke; k++)
-                lozinkaZaDes[k-1] = kriptovanTekst[k];
-            byte [] desKriptovanTekst = Arrays.copyOfRange(kriptovanTekst, (1+ duzinaLozinke) , kriptovanTekst.length);
+                lozinkaZaDes[k-1] = nizBajtova[k];
+            byte [] desKriptovanTekst = Arrays.copyOfRange(nizBajtova, (1+ duzinaLozinke) , nizBajtova.length);
             Cipher sifrat = Cipher.getInstance("RSA");
             PrivateKey privatekey = Main.KORISNIK.getPrivateKey();
             sifrat.init(Cipher.DECRYPT_MODE, privatekey);
-            for (byte a : lozinkaZaDes)
-                System.out.print(a);
+            
             byte [] rez = sifrat.doFinal(lozinkaZaDes);
             
             

@@ -118,14 +118,23 @@ duzina + K2 - upis u sliku
 
 //KODOVANJE U SLIKU:
 uzitavam privatni kljuc posiljaoca
-tekst kriptujem tim kljucem ///potpisivanje a ne kriptovanje
-pravi se tekstZaUpis = u 9 prvih bita upisujem primaoca + kriptovan tekst
+tekst potpisujem tim kljucem 
+pravi se tekstZaUpis = prviBit je duzina primaoca + primalac + kriptovan tekst
+
+kreira se 3DES kljuc duzine 10
+kriptuje se tekst za upis sa 3DES algoritmom
+
 ucitava se javni kljuc primaoca
-tekstZaUpie se kriptuje tim kljucem
+3DESKljuc se kriptuje tim kljucem
+Kreira se DESLozinkaISifrat = 1(duzinalozinke) + lozinka + 3DES siftrat
+
 provjera da li se duzina teksta moze snimiti u sliku
+
+OVDE SU BITI!!!
 pravi se  nizZaUpis = 24 bita(duzina teksta koja se upisuje) + prethodno kriptovan tekst
 duzina se pretvara u niz bita i upisuje u prve 24 pozicije
 kriptovan tekst se pretvara u niz bita i upisuje u ostale pozicije
+
 vrsi se upis u sliku gdje je data putanja do slike gdje se upisuje
 
 
@@ -142,42 +151,6 @@ duzina usera (10*8)  === padding za +1 ili +2 / jer mora biti djeljivo sa 3!!!
 prvih 8 piksela odredjuje duzinu upisanog teksta!
 
 
-
-
-
-
-
-
-
-
-
-
-    @Systemname                       varchar(20)= null out,
-    @Modulename                       varchar(5)= null out,
-    @Maxrows                          int = 1000,
-    @Currentversion                   bigint = NULL,
-    @Updateversion                    bit = 1,
-    @Arrangmentnumber                 varchar(20) = NULL,
-    @PartyKey					      varchar(30) = NULL,
-    @Batchid                          varchar(50) = NULL,
-    @Newversion                       bigint = NULL OUT
-	
-	DECLARE @Ressum int				
-    SET @Ressum = 0
-
-    DECLARE @I int
-    SET @I = 1
-
-    DECLARE @Res int
-    DECLARE @Tmpmodulename varchar(5)
-
-    declare @ReturnSystemName varchar(36)
-
-resume
-i
-res
-tempmodulename
-returnSYSName
 
 
 
