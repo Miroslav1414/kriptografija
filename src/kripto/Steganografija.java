@@ -135,45 +135,56 @@ public class Steganografija {
         potpis.initSign(privateKey);
         potpis.update(Helper.stringToByte(tekst));
         
-        System.out.println("TEKST:");
-        System.out.println(tekst);
+//        System.out.println("TEKST:");
+//        System.out.println(tekst);
 
         byte[] kriptovanTekst = potpis.sign();
         System.out.println("\n======\nPOTPISAN TEKST!");
         System.out.println(Helper.byteToString(kriptovanTekst));
 
-        byte [] niz64 = Base64.getEncoder().encode(kriptovanTekst);
+        byte [] niz64 = kriptovanTekst;
+            System.out.println("DUZINA NIZA:" + niz64.length);
+//        byte [] niz64 = Base64.getEncoder().encode(kriptovanTekst);
+//        
+//        System.out.println("\n======\nPOTPISAN TEKST 64!");
+//        System.out.println(Helper.byteToString(niz64));
+
+        Signature publicSignature = Signature.getInstance("SHA256withRSA");
+        publicSignature.initVerify(Main.KORISNIK.getPublicKey());
+        publicSignature.update(niz64);
+        System.out.println(publicSignature.verify(niz64));
         
-                System.out.println("\n======\nPOTPISAN TEKST 64!");
-        System.out.println(Helper.byteToString(kriptovanTekst));
         
         
-        byte [] tekstZaUpis = new byte[1 + primalac.length() + niz64.length];
+        byte [] tekstZaUpis = new byte[1 + Main.KORISNIK.getUsername().length() + niz64.length];
         
         
         byte [] brojSlovaPrimaoca = new byte[1];
-        brojSlovaPrimaoca = Helper.stringToByte(String.valueOf(primalac.length()));
+        brojSlovaPrimaoca = Helper.stringToByte(String.valueOf(Main.KORISNIK.getUsername().length()));
         System.arraycopy(brojSlovaPrimaoca,0,tekstZaUpis,0,1);
-        System.arraycopy(Helper.stringToByte(primalac),0,tekstZaUpis,1,primalac.length());
-        System.arraycopy(niz64,0,tekstZaUpis,(primalac.length()+1),niz64.length);
+        System.arraycopy(Helper.stringToByte(Main.KORISNIK.getUsername()),0,tekstZaUpis,1,Main.KORISNIK.getUsername().length());
+        System.arraycopy(niz64,0,tekstZaUpis,(Main.KORISNIK.getUsername().length()+1),niz64.length);
         
         
-                System.out.println("\n----------");
-                for (byte a : tekstZaUpis)
-                System.out.print(a);
-                System.out.println("\n----------");
+//                System.out.println("\n----------");
+//                for (byte a : tekstZaUpis)
+//                System.out.print(a);
+//                System.out.println("\n----------");
         
         Sertifikat sert = new Sertifikat(Helper.SERTIFIKATI + primalac + ".der");
         PublicKey publicKey = sert.getPublicKey();
         
-        System.out.println("tekst za upis! Pomocu metode");
-        System.out.println(Helper.byteToString(tekstZaUpis));
+//        System.out.println("tekst za upis! Pomocu metode");
+//        System.out.println(Helper.byteToString(tekstZaUpis));
         
         String desLozinka = Helper.getRandomString(10);
+        System.out.println("************:" + desLozinka);
         byte [] desKriptovanTekst = new TripleDES().encrypt(Helper.byteToString(tekstZaUpis), desLozinka);
+        System.out.println("++++++++++++:"+Helper.byteToString(desKriptovanTekst));
         Cipher sifrat = Cipher.getInstance("RSA");
         sifrat.init(Cipher.ENCRYPT_MODE, publicKey);
         byte [] lozinka = sifrat.doFinal(Helper.stringToByte(desLozinka));
+        
         byte duzinaLozinke =0 ;
         switch ( lozinka.length){
             case 64 : duzinaLozinke = 1; break;
@@ -220,7 +231,11 @@ public class Steganografija {
 //                    System.out.print(a);
 //                System.out.println("\n----------");
                 byte [] temp = nizCharovaUnizBita(kriptovanTekstZaUpis);
+                
+                
                 System.arraycopy(temp,0,nizZaUpis,24,temp.length);
+                
+                System.out.println("duzina upisa:"+ nizZaUpis.length);
                 for (byte a : nizZaUpis)
                     System.out.print(a);
                 
@@ -279,6 +294,7 @@ public class Steganografija {
             petlja_1:
             for(;i<slikaDekripcija.getWidth();i++)
             {
+                if (i>0) j=0;
                 for(; j<slikaDekripcija.getHeight() ;j++){
                     if (prvih8Bita >=8) break petlja_1;
                     System.arraycopy(citajPixele(slikaDekripcija.getRGB(i, j)),0,duzinaPoruke, pozicija,3);
@@ -301,17 +317,22 @@ public class Steganografija {
             petlja_2:
             for(;i<slikaDekripcija.getWidth();i++)
             {
+                if (i>0) j=0;
                 for(; j<slikaDekripcija.getHeight();j++){
                     if (pozicija >= duzinaPorukeInt) break petlja_2;
                     System.arraycopy(citajPixele(slikaDekripcija.getRGB(i, j)),0,kriptovanTekst, pozicija,3);
                     pozicija +=3;
                 }
             }
+            
+//            System.out.println("ucitani tekst duzina:" + kriptovanTekst);
+//            for (byte a : kriptovanTekst)
+//                System.out.print(a);
             //brise visak            
             kriptovanTekst = Arrays.copyOf(kriptovanTekst, duzinaPorukeIntPocetna);
             
             //pretvara bite u bajte
-            byte [] nizBajtova= new byte [duzinaPorukeIntPocetna];
+            byte [] nizBajtova= new byte [duzinaPorukeIntPocetna/8];
             pozicija = 0;
         
             for (int k = 0; k<duzinaPorukeIntPocetna;k+=8){
@@ -338,7 +359,42 @@ public class Steganografija {
             PrivateKey privatekey = Main.KORISNIK.getPrivateKey();
             sifrat.init(Cipher.DECRYPT_MODE, privatekey);
             
-            byte [] rez = sifrat.doFinal(lozinkaZaDes);
+            byte [] lozinkaZaDesString = sifrat.doFinal(lozinkaZaDes);
+            
+            byte [] dekriptovanTekst = Helper.stringToByte(new TripleDES().decrypt(desKriptovanTekst, Helper.byteToString(lozinkaZaDesString)));
+            
+            
+            int brojSlovaPrimaoca = dekriptovanTekst[0] - 48;
+            String posiljaoc = "";
+            for (int k=1 ; k<=brojSlovaPrimaoca; k++)
+                posiljaoc += (char)dekriptovanTekst[k];
+            
+            
+            byte [] niz64 = new byte[ dekriptovanTekst.length - 1 - brojSlovaPrimaoca];
+            System.arraycopy(dekriptovanTekst, 1+brojSlovaPrimaoca, niz64, 0, niz64.length);
+            System.out.println(Helper.byteToString(niz64));
+            
+            byte[] niz = niz64;
+            //byte[] niz = Base64.getDecoder().decode(niz64);
+            System.out.println(Helper.byteToString(niz));
+            Sertifikat sert = new Sertifikat(Helper.SERTIFIKATI + posiljaoc + ".der");
+            
+            
+            
+        Signature publicSignature = Signature.getInstance("SHA256withRSA");
+        publicSignature.initVerify(sert.getPublicKey());
+        publicSignature.update(niz);
+        
+        System.out.println("DUZINA NIZA:" + niz.length);
+
+        System.out.println(Helper.byteToString(niz)); 
+        System.out.println(publicSignature.verify(niz));
+
+            
+            
+            
+            
+            
             
             
             

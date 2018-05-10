@@ -51,6 +51,7 @@ public class Helper {
         return rez;
     }
     
+    
     public static int nizBitaUInt(byte [] niz){
         int rez = 0;
         byte [] temp = obrniNiz(niz);

@@ -40,6 +40,10 @@ public class User {
     public PrivateKey getPrivateKey(){
         return sertifikat.getPrivateKey();
     }
+    
+    public PublicKey getPublicKey(){
+        return sertifikat.getPublicKey();
+    }
 
     public void writeUsers() {
         try {

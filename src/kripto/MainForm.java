@@ -164,7 +164,7 @@ public class MainForm extends javax.swing.JFrame {
     private void btnDekriptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDekriptActionPerformed
         try {
             Steganografija asd = new Steganografija();
-            asd.dekodovanje("src//slike_kriptovane//5VN30sfG0TuZnK7oZFGV.png");
+            asd.dekodovanje("src//slike_kriptovane//rHj8ylI33E3i8POmVONj.png");
 
         } catch (Exception e) {
             e.printStackTrace();
