@@ -138,9 +138,7 @@ public class Helper {
                 }
             }
 
-        } catch (StreamCorruptedException sce) {
-            sce.printStackTrace();
-        } catch (Exception ex) {
+        }  catch (Exception ex) {
             new Poruka("Poruke nisu dobro ucitane!", "ERROR", "ERROR");
             ex.printStackTrace();
         }
