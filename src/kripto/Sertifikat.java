@@ -140,34 +140,29 @@ public class Sertifikat {
             sertifikat.checkValidity();
             return true;
         } catch (CertificateExpiredException e) {
-            System.out.println("Istekao certifikat");
-            e.printStackTrace();
+            //System.out.println("Istekao certifikat");
+            
+            return false;
         } catch (CertificateNotYetValidException e) {
-            System.out.println("Certifikat nije jos validan");
-            e.printStackTrace();
+            //System.out.println("Certifikat nije jos validan");
+            return false;
         }
-        return false;
+        
     }
 
-    //fa li je CRL lista od ogovarajuceg CA //valjda je svaka lista potpisana prilikom kreiranja
-    private boolean verifyCrlSign() {
-        if (CRL != null) {
-            try {
-                CRL.verify(CA_CERT.getPublicKey());
-                return true;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
-        return false;
-    }
-    
-    //da li je privatni kljuc kljuc bas tog sertifikata
-//    public boolean isMatch(){
-//        privateKey.
+//    //fa li je CRL lista od ogovarajuceg CA //valjda je svaka lista potpisana prilikom kreiranja
+//    private boolean verifyCrlSign() {
+//        if (CRL != null) {
+//            try {
+//                CRL.verify(CA_CERT.getPublicKey());
+//                return true;
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                return false;
+//            }
+//        }
+//        return false;
 //    }
-    
-    
+
 
 }

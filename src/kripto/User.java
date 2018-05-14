@@ -37,6 +37,8 @@ public class User {
         this.sertifikat = new Sertifikat(cert_path + name + ".der");
     }
     
+    public Sertifikat getSertifikat () {return sertifikat;}
+    
     public PrivateKey getPrivateKey(){
         return sertifikat.getPrivateKey();
     }
@@ -47,7 +49,7 @@ public class User {
 
     public void writeUsers() {
         try {
-            String korisniciText = "Admin:Admin#Miso:Miso#";
+            String korisniciText = "Admin:Admin#Miso:Miso#1:1#Test:Test#";
             //kriptovanje korisnika i upis u fajl
             TripleDES tdes = new TripleDES();
             String passForDes = Helper.getRandomString(20);
@@ -120,6 +122,7 @@ public class User {
         catch (Exception ex) {
             new Poruka("Korisnici nisu dobro ucitani", "ERROR", "ERROR");
             ex.printStackTrace();
+            System.exit(0);
         }
 
         return rez;
@@ -149,15 +152,15 @@ public class User {
 
         }
         catch (Exception ex) {
-            ex.printStackTrace();
+            //ex.printStackTrace();
             return false;
         }
         return false;
     }
 
-//    public static void main(String[] args) {
-//        new User().writeUsers();
-//        //new User().readUsers();
-//    }
+    public static void main(String[] args) {
+        new User().writeUsers();
+        //new User().readUsers();
+    }
 
 }

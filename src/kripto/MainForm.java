@@ -5,6 +5,10 @@
  */
 package kripto;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -24,6 +28,29 @@ public class MainForm extends javax.swing.JFrame {
     public String getStelectedUSer(){
         return listUsers.getSelectedValue();
     }
+    
+    public DefaultListModel popuniPoruke(){
+        
+        DefaultListModel model = new DefaultListModel();
+        Set set = Main.NIZ_PORUKA.entrySet();
+            Iterator iterator = set.iterator();
+            while (iterator.hasNext()) {
+                Map.Entry mentry = (Map.Entry) iterator.next();
+                if(((Message)mentry.getValue()).getReceiver().equals(Main.KORISNIK.getUsername()))
+                {
+                    if (new File("src//slike_kriptovane//"+ (String)mentry.getKey() +".png").exists())
+                    model.addElement(new Slika((String)mentry.getKey(),
+                    new ImageIcon(new ImageIcon("src//slike_kriptovane//"+ (String)mentry.getKey() +".png").getImage()
+                            .getScaledInstance(200, 150, java.awt.Image.SCALE_SMOOTH))));
+                    else
+                        model.addElement(new Slika((String)mentry.getKey(),
+                        new ImageIcon(new ImageIcon("src//root//deleted.jpg").getImage()
+                            .getScaledInstance(200, 150, java.awt.Image.SCALE_SMOOTH))));
+                }
+                
+            }
+            return model;
+    }
 
     public void popuniKorisnike(User user){
         ArrayList<User>  korisnici = new ArrayList<User>(Arrays.asList(Main.KORISNICI));
@@ -39,24 +66,25 @@ public class MainForm extends javax.swing.JFrame {
         initComponents();
         btnDekript.setEnabled(false);
         popuniKorisnike(Main.KORISNIK);
-        DefaultListModel model = new DefaultListModel();
-        
-        Set set = Main.NIZ_PORUKA.entrySet();
-            Iterator iterator = set.iterator();
-            while (iterator.hasNext()) {
-                Map.Entry mentry = (Map.Entry) iterator.next();
-                if(((Message)mentry.getValue()).getReceiver().equals(Main.KORISNIK.getUsername()))
-                model.addElement(new Slika((String)mentry.getKey(),
-                new ImageIcon(new ImageIcon("src//slike_kriptovane//"+ (String)mentry.getKey() +".png").getImage()
-                        .getScaledInstance(200, 150, java.awt.Image.SCALE_SMOOTH))));
-                
-//                System.out.print("key is: " + mentry.getKey() + " & Value is: ");
-//                System.out.println(mentry.getValue());
-            }
+        //popuniPoruke();
+////        DefaultListModel model = new DefaultListModel();
+////        
+////        Set set = Main.NIZ_PORUKA.entrySet();
+////            Iterator iterator = set.iterator();
+////            while (iterator.hasNext()) {
+////                Map.Entry mentry = (Map.Entry) iterator.next();
+////                if(((Message)mentry.getValue()).getReceiver().equals(Main.KORISNIK.getUsername()))
+////                model.addElement(new Slika((String)mentry.getKey(),
+////                new ImageIcon(new ImageIcon("src//slike_kriptovane//"+ (String)mentry.getKey() +".png").getImage()
+////                        .getScaledInstance(200, 150, java.awt.Image.SCALE_SMOOTH))));
+////                
+//////                System.out.print("key is: " + mentry.getKey() + " & Value is: ");
+//////                System.out.println(mentry.getValue());
+//            }
 
         //RENDER IMAGES N TEXT
         listMessage.setCellRenderer(new Renderer());
-        listMessage.setModel(model);
+        listMessage.setModel(popuniPoruke());
     }
 
     /**
@@ -116,38 +144,43 @@ public class MainForm extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(34, 34, 34)
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1)
-                    .addComponent(btnPosaljiPoruku))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnDekript)
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 488, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(jLabel1)
+                            .addComponent(btnPosaljiPoruku))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 98, Short.MAX_VALUE)
+                                .addComponent(jLabel2)
+                                .addGap(477, 477, 477))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(98, 98, 98)
+                                .addComponent(btnDekript)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 499, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(22, 22, 22))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(31, 31, 31)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1))
-                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 391, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnPosaljiPoruku)
-                    .addComponent(btnDekript))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnDekript)
+                    .addComponent(btnPosaljiPoruku))
+                .addContainerGap())
         );
 
         pack();
@@ -172,11 +205,20 @@ public class MainForm extends javax.swing.JFrame {
     private void btnPosaljiPorukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPosaljiPorukuActionPerformed
         if (listUsers.getSelectedIndex() == -1) {
             new Poruka("Niste izabrali korisnika kome zelite da posaljete poruku", "Warrning", "Warrning");
-        } else {
+        }
+        else {
+            User temp = null;
+            for (User u : Main.KORISNICI)
+                if(u.getUsername().equalsIgnoreCase(getStelectedUSer()))
+                    temp = u;
+            if (!temp.getSertifikat().isValidOnDate() || temp.getSertifikat().isRevoked())
+                new Poruka("Sertifikat korisnika kome zelite da posaljete poruku je nevazeci!", "Info", "Info");
+            else {
             PosaljiPoruku posaljiPoruku = new PosaljiPoruku(this);
             posaljiPoruku.setLocationRelativeTo(null);
             posaljiPoruku.setModal(true);
             posaljiPoruku.setVisible(true);
+            }
         }
         
     }//GEN-LAST:event_btnPosaljiPorukuActionPerformed
@@ -190,18 +232,35 @@ public class MainForm extends javax.swing.JFrame {
             
             //System.out.println(sl.getPath());
             //System.out.println(listMessage.getSelectedValue());
-              Set set = Main.NIZ_PORUKA.entrySet();
+            //Set set = Main.NIZ_PORUKA.entrySet();
             Steganografija asd = new Steganografija();
-            String ispis = asd.dekodovanje("src//slike_kriptovane//"+sl.getPath()+".png");
-            new Poruka(ispis, "INFO", "INFO");
-            Main.NIZ_PORUKA.remove(sl.getPath());
-            
-            Iterator iterator = set.iterator();
-            while (iterator.hasNext()) {
-                Map.Entry mentry = (Map.Entry) iterator.next();
-                System.out.print("key is: " + mentry.getKey() + " & Value is: ");
-                System.out.println(mentry.getValue());
+            if(! new File("src//slike_kriptovane//"+sl.getPath()+".png").exists())
+                new Poruka("Neko je izbrisao sliku sa fajl sistema.", "INFO", "INFO");
+            else{
+                Message msg = Main.NIZ_PORUKA.get(sl.getPath());
+                
+                byte[] hashSlike = Files.readAllBytes(Paths.get("src//slike_kriptovane//"+sl.getPath()+".png"));
+                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                byte[] hash = md.digest(hashSlike);
+                
+                if(Arrays.equals(hash, msg.getPictureHash())){                
+                String ispis = asd.dekodovanje("src//slike_kriptovane//"+sl.getPath()+".png");
+                new Poruka(ispis, "INFO", "INFO");}
+                
+                else 
+                    new Poruka("Neko je zamjenio orginalnu sliku!", "INFO", "INFO");
             }
+            
+            
+            Main.NIZ_PORUKA.remove(sl.getPath());
+            try{
+            File file = new File("src//slike_kriptovane//"+sl.getPath()+".png");
+            file.delete();
+            }
+            catch(Exception e){e.printStackTrace();}
+            
+            listMessage.setModel(popuniPoruke());
+            btnDekript.setEnabled(false);
                   
 
         } catch (Exception e) {

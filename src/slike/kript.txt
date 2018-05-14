@@ -16,29 +16,25 @@ lokacija kljuca
 
 
 
--informacije o crl listi
-crl -in file.crl -text
-
--generisanje nove crl liste
 
 
 -CITAV PROCES
-genrsa -out kljucevi/miso_private_key.pem 2048
-req -new -key kljucevi/miso_private_key.pem -config openssl.cnf -out req1.csr
+genrsa -out kljucevi/milan_private_key.pem 2048
+req -new -key kljucevi/milan_private_key.pem -config openssl.cnf -out milan_req1.csr
 BA
 RS
 Banja Luka
 ETF
 CA_MiroslavMandic
-Miso
-Miso@gmail.com
+milan
+milan@gmail.com
 
 
-ca -in req1.csr -out certs/miso.pem -config openssl.cnf -days 100
+ca -in milan_req1.csr -out certs/milan.pem -config openssl.cnf -days 100
 y
 y
-x509 -in certs/miso.pem -inform PEM -outform DER -out certs/miso.der
-pkcs8 -topk8 -inform PEM -outform DER -in kljucevi/miso_private_key.pem -out kljucevi/miso_private_key.der -nocrypt
+x509 -in certs/milan.pem -inform PEM -outform DER -out certs/milan.der
+pkcs8 -topk8 -inform PEM -outform DER -in kljucevi/milan_private_key.pem -out kljucevi/milan_private_key.der -nocrypt
 
 
 
@@ -58,7 +54,13 @@ pkcs8 -topk8 -inform PEM -outform DER -in kljucevi/miso_private_key.pem -out klj
 -prebaciti privatni kljuc u PKCS8
 	pkcs8 -topk8 -inform PEM -outform DER -in kljucevi/miso_private_key.pem -out kljucevi/miso_private_key.der -nocrypt
 
-
+CRL
+-informacije o crl listi
+	crl -in file.crl -text
+-pretvaranje iz pem u der
+	crl -in imeCrl.pem -out crl2.der -outform der -inform pem
+-generisanje nove crl liste
+	ca -gencrl -out imeCrl.pem -config openssl.cnf
 
 
 

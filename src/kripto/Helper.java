@@ -7,6 +7,7 @@ package kripto;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -38,29 +39,8 @@ public class Helper {
     
     public  static void serijalizujPoruke(){
         try{
-            //FileOutputStream fos = new FileOutputStream(PORUKE_SERIJALIZOVANE);
-            //ObjectOutputStream oos = new ObjectOutputStream(fos);
-            //oos.writeObject(Main.NIZ_PORUKA);
             if (Main.NIZ_PORUKA.isEmpty()) {
-//                String passForDes = Helper.getRandomString(20);
-//                Sertifikat ca = new Sertifikat();
-//                PublicKey publicKey = ca.CA_CERT.getPublicKey();
-//                Cipher sifrat = Cipher.getInstance("RSA");
-//                sifrat.init(Cipher.ENCRYPT_MODE, publicKey);
-//                
-//                byte[] kriptovanePoruke2 = Files.readAllBytes(Paths.get(PORUKE_SERIJALIZOVANE));
-//                MessageDigest md = MessageDigest.getInstance("SHA-256");
-//                byte[] hash = md.digest(kriptovanePoruke2);
-//
-//                byte[] hashCrypted = sifrat.doFinal(hash);
-//                byte[] lozinkaCrypted = sifrat.doFinal(passForDes.getBytes("utf-8"));
-//
-//                //upis u fajl 
-//                byte[] upisUFajl = new byte[hashCrypted.length + lozinkaCrypted.length];
-//                System.arraycopy(hashCrypted, 0, upisUFajl, 0, hashCrypted.length);
-//                System.arraycopy(lozinkaCrypted, 0, upisUFajl, hashCrypted.length, lozinkaCrypted.length);
-//
-//                Files.write(Paths.get(Helper.HASH_PASS_MSG_PATH), upisUFajl);
+                new File(PORUKE_SERIJALIZOVANE).delete();
             } else {
                 byte[] bajtovi = null;
 
@@ -113,48 +93,54 @@ public class Helper {
     public  static void ucitajSerijalizovanePoruke(){
                
         try {
-            Sertifikat ca = new Sertifikat();
-            PrivateKey privateKey = ca.PRIVATE_KEY;
-            Cipher sifrat = Cipher.getInstance("RSA");
-            sifrat.init(Cipher.DECRYPT_MODE, privateKey);
+            if (!new File(PORUKE_SERIJALIZOVANE).exists() && new File("src//slike_kriptovane").listFiles().length != 0)
+                new Poruka("Doslo je do greske prilikom ucitavanja poruka. "
+                        + "\nIli je Neko je izbrisao fajl gdje se nalaze podaci o porukama ili je dodao fajlove gdje se kriptovane poruke smjestaju!", "ERROR", "ERROR");
+            if (new File(PORUKE_SERIJALIZOVANE).exists()) {
+                Sertifikat ca = new Sertifikat();
+                PrivateKey privateKey = ca.PRIVATE_KEY;
+                Cipher sifrat = Cipher.getInstance("RSA");
+                sifrat.init(Cipher.DECRYPT_MODE, privateKey);
 
-            byte[] hashIPass = Files.readAllBytes(Paths.get(Helper.HASH_PASS_MSG_PATH));
-            byte[] hashCrypted = Arrays.copyOfRange(hashIPass, 0, 256);
-            byte[] passCrypted = Arrays.copyOfRange(hashIPass, 256, hashIPass.length);
+                byte[] hashIPass = Files.readAllBytes(Paths.get(Helper.HASH_PASS_MSG_PATH));
+                byte[] hashCrypted = Arrays.copyOfRange(hashIPass, 0, 256);
+                byte[] passCrypted = Arrays.copyOfRange(hashIPass, 256, hashIPass.length);
 
-            byte[] hash1 = sifrat.doFinal(hashCrypted);
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hash2 = md.digest(Files.readAllBytes(Paths.get(PORUKE_SERIJALIZOVANE)));
+                byte[] hash1 = sifrat.doFinal(hashCrypted);
+                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                byte[] hash2 = md.digest(Files.readAllBytes(Paths.get(PORUKE_SERIJALIZOVANE)));
 
-            if (!(Arrays.equals(hash1, hash2))) {
-                new Poruka("Poruke ne mogu biti validno ucitane! Neko je izvrsio neovlastenu izmjenu!", "ERROR", "ERROR");
-                System.exit(1);
-            }
+                if (!(Arrays.equals(hash1, hash2))) {
+                    new Poruka("Poruke ne mogu biti validno ucitane! Neko je izvrsio neovlastenu izmjenu!", "ERROR", "ERROR");
+                    System.exit(1);
+                }
 
-            String pass = new String(sifrat.doFinal(passCrypted), "UTF-8");
-            String poruke = new TripleDES().decrypt(Files.readAllBytes(Paths.get(PORUKE_SERIJALIZOVANE)), pass);
+                String pass = new String(sifrat.doFinal(passCrypted), "UTF-8");
 
-            byte [] porukeByte = stringToByte(poruke);
-            
-            ByteArrayInputStream bis = new ByteArrayInputStream(porukeByte);
-            ObjectInputStream in = null;
-            try {
-                in = new ObjectInputStream(bis);
-                Main.NIZ_PORUKA = (HashMap<String, Message>) in.readObject();
-                
-            } finally {
+                String poruke = new TripleDES().decrypt(Files.readAllBytes(Paths.get(PORUKE_SERIJALIZOVANE)), pass);
+
+                byte[] porukeByte = stringToByte(poruke);
+
+                ByteArrayInputStream bis = new ByteArrayInputStream(porukeByte);
+                ObjectInputStream in = null;
                 try {
-                    if (in != null) {
-                        in.close();
+                    in = new ObjectInputStream(bis);
+                    Main.NIZ_PORUKA = (HashMap<String, Message>) in.readObject();
+
+                } finally {
+                    try {
+                        if (in != null) {
+                            in.close();
+                        }
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
                     }
-                } catch (IOException ex) {
-                    ex.printStackTrace();
                 }
             }
-            
-            }
-        catch (StreamCorruptedException sce ){sce.printStackTrace();}
-        catch (Exception ex) {
+
+        } catch (StreamCorruptedException sce) {
+            sce.printStackTrace();
+        } catch (Exception ex) {
             new Poruka("Poruke nisu dobro ucitane!", "ERROR", "ERROR");
             ex.printStackTrace();
         }

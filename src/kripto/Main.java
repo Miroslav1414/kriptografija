@@ -28,7 +28,6 @@ public class Main {
         
         KORISNICI = new User().readUsers();
         NIZ_PORUKA = new HashMap<String,Message>();
-        //Helper.serijalizujPoruke();
         Helper.ucitajSerijalizovanePoruke();
         
         java.awt.EventQueue.invokeLater(new Runnable() {
