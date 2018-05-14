@@ -5,8 +5,22 @@
  */
 package kripto;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
 import static java.lang.Math.pow;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Random;
+import javax.crypto.Cipher;
 
 /**
  *
@@ -16,9 +30,137 @@ public class Helper {
     
     public static final String USER_PATH = "src//root//user.usx";
     public static final String HASH_PASS_PATH = "src//root//hp.hp";
+    public static final String HASH_PASS_MSG_PATH = "src//root//msg.hp";
     public static final String SERTIFIKATI = "src//sertifikati//";
+    public static final String PORUKE_SERIJALIZOVANE = "src//root//msg.ser";
     
     public Helper(){}
+    
+    public  static void serijalizujPoruke(){
+        try{
+            //FileOutputStream fos = new FileOutputStream(PORUKE_SERIJALIZOVANE);
+            //ObjectOutputStream oos = new ObjectOutputStream(fos);
+            //oos.writeObject(Main.NIZ_PORUKA);
+            if (Main.NIZ_PORUKA.isEmpty()) {
+//                String passForDes = Helper.getRandomString(20);
+//                Sertifikat ca = new Sertifikat();
+//                PublicKey publicKey = ca.CA_CERT.getPublicKey();
+//                Cipher sifrat = Cipher.getInstance("RSA");
+//                sifrat.init(Cipher.ENCRYPT_MODE, publicKey);
+//                
+//                byte[] kriptovanePoruke2 = Files.readAllBytes(Paths.get(PORUKE_SERIJALIZOVANE));
+//                MessageDigest md = MessageDigest.getInstance("SHA-256");
+//                byte[] hash = md.digest(kriptovanePoruke2);
+//
+//                byte[] hashCrypted = sifrat.doFinal(hash);
+//                byte[] lozinkaCrypted = sifrat.doFinal(passForDes.getBytes("utf-8"));
+//
+//                //upis u fajl 
+//                byte[] upisUFajl = new byte[hashCrypted.length + lozinkaCrypted.length];
+//                System.arraycopy(hashCrypted, 0, upisUFajl, 0, hashCrypted.length);
+//                System.arraycopy(lozinkaCrypted, 0, upisUFajl, hashCrypted.length, lozinkaCrypted.length);
+//
+//                Files.write(Paths.get(Helper.HASH_PASS_MSG_PATH), upisUFajl);
+            } else {
+                byte[] bajtovi = null;
+
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                ObjectOutputStream out = new ObjectOutputStream(bos);
+                try {
+                    out.writeObject(Main.NIZ_PORUKA);
+                    out.flush();
+                    bajtovi = bos.toByteArray();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        bos.close();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                TripleDES tdes = new TripleDES();
+                String passForDes = Helper.getRandomString(20);
+                byte[] kriptovanePoruke = tdes.encrypt(byteToString(bajtovi), passForDes);
+                Files.write(Paths.get(PORUKE_SERIJALIZOVANE), kriptovanePoruke);
+
+                //hash fajla i kriptovanje kljuca i hasha javnim kljucem CA
+                byte[] kriptovanePoruke2 = Files.readAllBytes(Paths.get(PORUKE_SERIJALIZOVANE));
+                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                byte[] hash = md.digest(kriptovanePoruke2);
+
+                Sertifikat ca = new Sertifikat();
+                PublicKey publicKey = ca.CA_CERT.getPublicKey();
+                Cipher sifrat = Cipher.getInstance("RSA");
+                sifrat.init(Cipher.ENCRYPT_MODE, publicKey);
+
+                byte[] hashCrypted = sifrat.doFinal(hash);
+                byte[] lozinkaCrypted = sifrat.doFinal(passForDes.getBytes("utf-8"));
+
+                //upis u fajl 
+                byte[] upisUFajl = new byte[hashCrypted.length + lozinkaCrypted.length];
+                System.arraycopy(hashCrypted, 0, upisUFajl, 0, hashCrypted.length);
+                System.arraycopy(lozinkaCrypted, 0, upisUFajl, hashCrypted.length, lozinkaCrypted.length);
+
+                Files.write(Paths.get(Helper.HASH_PASS_MSG_PATH), upisUFajl);
+
+            }
+        }
+        catch(Exception e){e.printStackTrace();}
+    }
+    public  static void ucitajSerijalizovanePoruke(){
+               
+        try {
+            Sertifikat ca = new Sertifikat();
+            PrivateKey privateKey = ca.PRIVATE_KEY;
+            Cipher sifrat = Cipher.getInstance("RSA");
+            sifrat.init(Cipher.DECRYPT_MODE, privateKey);
+
+            byte[] hashIPass = Files.readAllBytes(Paths.get(Helper.HASH_PASS_MSG_PATH));
+            byte[] hashCrypted = Arrays.copyOfRange(hashIPass, 0, 256);
+            byte[] passCrypted = Arrays.copyOfRange(hashIPass, 256, hashIPass.length);
+
+            byte[] hash1 = sifrat.doFinal(hashCrypted);
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hash2 = md.digest(Files.readAllBytes(Paths.get(PORUKE_SERIJALIZOVANE)));
+
+            if (!(Arrays.equals(hash1, hash2))) {
+                new Poruka("Poruke ne mogu biti validno ucitane! Neko je izvrsio neovlastenu izmjenu!", "ERROR", "ERROR");
+                System.exit(1);
+            }
+
+            String pass = new String(sifrat.doFinal(passCrypted), "UTF-8");
+            String poruke = new TripleDES().decrypt(Files.readAllBytes(Paths.get(PORUKE_SERIJALIZOVANE)), pass);
+
+            byte [] porukeByte = stringToByte(poruke);
+            
+            ByteArrayInputStream bis = new ByteArrayInputStream(porukeByte);
+            ObjectInputStream in = null;
+            try {
+                in = new ObjectInputStream(bis);
+                Main.NIZ_PORUKA = (HashMap<String, Message>) in.readObject();
+                
+            } finally {
+                try {
+                    if (in != null) {
+                        in.close();
+                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            
+            }
+        catch (StreamCorruptedException sce ){sce.printStackTrace();}
+        catch (Exception ex) {
+            new Poruka("Poruke nisu dobro ucitane!", "ERROR", "ERROR");
+            ex.printStackTrace();
+        }
+        
+    }
+    
     
     public static String getRandomString(int duzina){
         char [] nizSlova = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".toCharArray();

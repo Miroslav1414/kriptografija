@@ -5,8 +5,7 @@
  */
 package kripto;
 
-import java.io.File;
-import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -14,13 +13,23 @@ import java.util.ArrayList;
  */
 public class Main {
     
-    public File PRIVATE_KEY_FILE;
+    //public File PRIVATE_KEY_FILE;
     public static User KORISNIK;
     public static User [] KORISNICI;
+    public static HashMap <String,Message> NIZ_PORUKA;
     
     
     public static void main (String [] args){
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+        public void run() {
+            Helper.serijalizujPoruke();
+        }
+    }, "Shutdown-thread"));
+        
         KORISNICI = new User().readUsers();
+        NIZ_PORUKA = new HashMap<String,Message>();
+        //Helper.serijalizujPoruke();
+        Helper.ucitajSerijalizovanePoruke();
         
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {

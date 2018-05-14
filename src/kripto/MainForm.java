@@ -5,16 +5,13 @@
  */
 package kripto;
 
-import java.awt.GridLayout;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import kripto.ListaSlika.Renderer;
 import kripto.ListaSlika.Slika;
 
@@ -40,11 +37,22 @@ public class MainForm extends javax.swing.JFrame {
     public MainForm() {
         
         initComponents();
+        btnDekript.setEnabled(false);
         popuniKorisnike(Main.KORISNIK);
         DefaultListModel model = new DefaultListModel();
-        model.addElement(new Slika("Michael Carrick",
-                new ImageIcon(new ImageIcon("src//slike//Desert.jpg").getImage()
+        
+        Set set = Main.NIZ_PORUKA.entrySet();
+            Iterator iterator = set.iterator();
+            while (iterator.hasNext()) {
+                Map.Entry mentry = (Map.Entry) iterator.next();
+                if(((Message)mentry.getValue()).getReceiver().equals(Main.KORISNIK.getUsername()))
+                model.addElement(new Slika((String)mentry.getKey(),
+                new ImageIcon(new ImageIcon("src//slike_kriptovane//"+ (String)mentry.getKey() +".png").getImage()
                         .getScaledInstance(200, 150, java.awt.Image.SCALE_SMOOTH))));
+                
+//                System.out.print("key is: " + mentry.getKey() + " & Value is: ");
+//                System.out.println(mentry.getValue());
+            }
 
         //RENDER IMAGES N TEXT
         listMessage.setCellRenderer(new Renderer());
@@ -64,9 +72,10 @@ public class MainForm extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         listMessage = new javax.swing.JList();
         jScrollPane1 = new javax.swing.JScrollPane();
-        listUsers = new javax.swing.JList<String>();
+        listUsers = new javax.swing.JList<>();
         btnPosaljiPoruku = new javax.swing.JButton();
         btnDekript = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -100,6 +109,8 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
+        jLabel2.setText("Poruke:");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -107,42 +118,51 @@ public class MainForm extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(34, 34, 34)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1)
+                    .addComponent(btnPosaljiPoruku))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(78, 78, 78)
                         .addComponent(btnDekript)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 212, Short.MAX_VALUE)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 312, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(22, 22, 22))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 488, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(74, 74, 74)
-                .addComponent(btnPosaljiPoruku)
-                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(31, 31, 31)
-                .addComponent(jLabel1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
-                        .addComponent(jScrollPane1))
-                    .addComponent(btnDekript))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1))
                 .addGap(18, 18, 18)
-                .addComponent(btnPosaljiPoruku)
-                .addContainerGap(118, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnPosaljiPoruku)
+                    .addComponent(btnDekript))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void listMessageMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listMessageMouseClicked
-        Poruka poruka = new Poruka("KLIKNUO SAM", "KLIK", "INFO");
+        //Poruka poruka = new Poruka("KLIKNUO SAM", "KLIK", "INFO");
+        if(listMessage.getSelectedIndex() != -1){
+            btnDekript.setEnabled(true);
+            
+            
+            
+//        DefaultListModel model = (DefaultListModel) listMessage.getModel();
+//        model.remove(listMessage.getSelectedIndex());
+        }
     }//GEN-LAST:event_listMessageMouseClicked
 
     private void listUsersMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listUsersMouseClicked
@@ -163,8 +183,26 @@ public class MainForm extends javax.swing.JFrame {
 
     private void btnDekriptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDekriptActionPerformed
         try {
+//            Steganografija asd = new Steganografija();
+//            asd.dekodovanje("src//slike_kriptovane//XGaoHuiWu83tSjpi5NFu.png");
+            
+            Slika sl = (Slika)listMessage.getModel().getElementAt(listMessage.getSelectedIndex());
+            
+            //System.out.println(sl.getPath());
+            //System.out.println(listMessage.getSelectedValue());
+              Set set = Main.NIZ_PORUKA.entrySet();
             Steganografija asd = new Steganografija();
-            asd.dekodovanje("src//slike_kriptovane//XGaoHuiWu83tSjpi5NFu.png");
+            String ispis = asd.dekodovanje("src//slike_kriptovane//"+sl.getPath()+".png");
+            new Poruka(ispis, "INFO", "INFO");
+            Main.NIZ_PORUKA.remove(sl.getPath());
+            
+            Iterator iterator = set.iterator();
+            while (iterator.hasNext()) {
+                Map.Entry mentry = (Map.Entry) iterator.next();
+                System.out.print("key is: " + mentry.getKey() + " & Value is: ");
+                System.out.println(mentry.getValue());
+            }
+                  
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -213,6 +251,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JButton btnDekript;
     private javax.swing.JButton btnPosaljiPoruku;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JList listMessage;

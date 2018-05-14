@@ -4,6 +4,9 @@ package kripto;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
@@ -138,6 +141,7 @@ public class Steganografija {
         byte[] tekstUByte = Helper.stringToByte(tekst);
         byte[] potpisTeksta = potpis.sign();
         byte[] kriptovanTekst = new byte[tekstUByte.length + 256];
+        System.out.println("duzina potpisa" + potpisTeksta.length);
         
         //tekst + potpis
         System.arraycopy(tekstUByte, 0, kriptovanTekst, 0, tekstUByte.length);
@@ -219,6 +223,12 @@ public class Steganografija {
                 while(!jedinstvenoIme);
                 upisiBiteUSliku(nizZaUpis,"src//slike_kriptovane//" + imeFajla + ".png");
                 
+                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                byte[] hash = md.digest(Files.readAllBytes(Paths.get("src//slike_kriptovane//" + imeFajla + ".png")));
+                
+                Main.NIZ_PORUKA.put(imeFajla,new Message("src//slike_kriptovane//" + imeFajla + ".png", hash, primalac));
+                
+                
             }
         }
         
@@ -250,8 +260,9 @@ public class Steganografija {
         return rez;
     }
     
-    public void dekodovanje (String putanjaDoslike) {
+    public String dekodovanje (String putanjaDoslike) {
         int prvih8Bita = 0,i=0,j=0;
+        String rez = "";
         try{
             BufferedImage slikaDekripcija =(ImageIO.read(new File(putanjaDoslike)));
             
@@ -355,45 +366,41 @@ public class Steganografija {
         
         
         publicSignature.update(tekst);
-        System.out.println(publicSignature.verify(potpisTeksta));
-        System.out.println(Helper.byteToString(tekst));
-
-            
-            
-            
-            
-            
-            
-            
-            
+//        System.out.println(publicSignature.verify(potpisTeksta));
+//        System.out.println(Helper.byteToString(tekst));
+        if (publicSignature.verify(potpisTeksta))
+            rez = Helper.byteToString(tekst);
+        else rez = "Poruka je neovlasteno promjenjena.";
+  
         }
         catch(Exception e){e.printStackTrace();
                 }
+        return rez;
         
         
     }
+//    
+//    public static void read(BufferedImage im){
+//        for (int i = 0; i < 1; i++) {
+//            for (int j = 0; j < 8;j++){
+//        int pixel = im.getRGB(i, j);
+//                int alpha = (pixel >> 24) & 0xff;
+//                int red = (pixel >> 16) & 0xff;
+//                int green = (pixel >> 8) & 0xff;
+//                int blue = (pixel) & 0xff;
+//                System.out.println("argb: " + alpha + ", " + red + ", " + green + ", " + blue);
+//            }
+//        }
+//    }
     
-    public static void read(BufferedImage im){
-        for (int i = 0; i < 1; i++) {
-            for (int j = 0; j < 8;j++){
-        int pixel = im.getRGB(i, j);
-                int alpha = (pixel >> 24) & 0xff;
-                int red = (pixel >> 16) & 0xff;
-                int green = (pixel >> 8) & 0xff;
-                int blue = (pixel) & 0xff;
-                System.out.println("argb: " + alpha + ", " + red + ", " + green + ", " + blue);
-            }
-        }
-    }
-    
-    public static void main(String [] args){
-        try {
-      Steganografija asd  = new Steganografija();
-      asd.dekodovanje("src//slike_kriptovane//rUiVP80mVg2PFT7kmUWs.png");
- 
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    }
+//    public static void main(String [] args){
+//        try {
+//      Steganografija asd  = new Steganografija();
+//      asd.dekodovanje("src//slike_kriptovane//rUiVP80mVg2PFT7kmUWs.png");
+// 
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//    }
+//    }
     
 }
