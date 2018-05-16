@@ -253,11 +253,17 @@ public class Steganografija {
                     byte[] hash = md.digest(Files.readAllBytes(Paths.get("src//slike_kriptovane//" + imeFajla + ".png")));
 
                     Main.NIZ_PORUKA.put(imeFajla, new Message("src//slike_kriptovane//" + imeFajla + ".png", hash, primalac));
+                    new Poruka("Poruka je poslata.", "INFO", "INFO");
 
                 }
             }
 
-        } catch (Exception e) {
+        } 
+        catch (NullPointerException nex){
+            new Poruka("Poruka nije poslata jer je umjesto slike ucitan fajl koji nije slika.", "ERROR", "ERROR");
+            nex.printStackTrace();}
+        catch (Exception e) {
+            new Poruka("Doslo je do greske. Poruka nije poslata.", "ERROR", "ERROR");
             e.printStackTrace();
         }
 
