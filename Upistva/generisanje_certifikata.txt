@@ -1,0 +1,53 @@
+zamjeniti "milan" sa imenom korisnika
+
+-CITAV PROCES
+genrsa -out kljucevi/milan_private_key.pem 2048
+req -new -key kljucevi/milan_private_key.pem -config openssl.cnf -out milan_req1.csr
+BA
+RS
+Banja Luka
+ETF
+CA_MiroslavMandic
+milan
+milan@gmail.com
+
+
+ca -in milan_req1.csr -out certs/milan.pem -config openssl.cnf -days 100
+y
+y
+x509 -in certs/milan.pem -inform PEM -outform DER -out certs/milan.der
+pkcs8 -topk8 -inform PEM -outform DER -in kljucevi/milan_private_key.pem -out kljucevi/milan_private_key.der -nocrypt
+
+
+
+
+
+
+
+
+
+
+-PROVJERA
+-provjera datuma certifikata
+	x509 -enddate -noout -in file.pem
+-generisati privatni kljuc
+	genrsa -out kljucevi/miso_private_key.pem 2048
+-keiranje zahtjeva za nivi certifikat
+	req -new -key kljucevi/miso_private_key.pem -config openssl.cnf -out req1.csr
+-odobriti zahtjev
+	ca -in req1.csr -out certs/miso.pem -config openssl.cnf -days 100
+-izbrisati req1.csr rucno
+-prebaciti sertifikat u DER format
+	x509 -in certs/miso.pem -inform PEM -outform DER -out certs/miso.der
+-prebaciti privatni kljuc u PKCS8
+	pkcs8 -topk8 -inform PEM -outform DER -in kljucevi/miso_private_key.pem -out kljucevi/miso_private_key.der -nocrypt
+
+CRL
+-informacije o crl listi
+	crl -in file.crl -text
+-pretvaranje iz pem u der
+	crl -in imeCrl.pem -out crl2.der -outform der -inform pem
+-generisanje nove crl liste
+	ca -gencrl -out imeCrl.pem -config openssl.cnf
+
+

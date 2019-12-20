@@ -1,0 +1,17 @@
+Za razvoj je koristen NetBeans.
+Projekat se nalazi u folderu Kripto.
+
+korisnicki nalozi su:
+
+korisnici nalog:	lozinka:
+Miso			Miso
+1			1
+Test			Test
+Admin			Admin
+
+
+Korisnicka imena i lozinke su case sensitive.
+
+
+Svi fajlovi potrebni za kreiranje infrastrukture javnog kljuca se nalaze u folderu CA.
+U dokumentu "generisanje_sertifikata" se nalazi proces kreiranja novog sertifikata i privatnog kljuca.
